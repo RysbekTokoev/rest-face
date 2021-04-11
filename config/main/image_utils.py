@@ -24,11 +24,12 @@ TOLERANCE = 0.7
 def compare_faces(stream=None, url=None):
     image = grab_image(stream=stream, url=url)
     locations = face_recognition.face_locations(image)
-    encoding = face_recognition.face_encodings(image, locations)[0]
-    for face in Face.objects.all():
-        results = face_recognition.compare_faces([encoding], np.frombuffer(face.encoding), TOLERANCE)
-        if True in results:
-            return face.username
+    encoding = face_recognition.face_encodings(image, locations)
+    if encoding:
+        for face in Face.objects.all():
+            results = face_recognition.compare_faces([encoding], np.frombuffer(face.encoding), TOLERANCE)
+            if True in results:
+                return face.username
     return "unknown face"
 
 
