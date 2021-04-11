@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script defer src="{% static '/face-api.min.js' %}"></script>
+  <script defer src="{% static '/script.js' %}"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <style>
+    canvas {
+      position: absolute;
+      top: 0px;
+    }
+
+    nav ul{
+      height:200px;
+      width:100%;
+      list-style-type:none;
+      overflow:hidden;
+      overflow-y:scroll;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="column" id="main">
+      <video id="video" width="720" height="560" autoplay muted></video>
+    </div>
+    <div class="column">
+      <nav>
+        <header>Faces (new on top):</header>
+        <ul id="log">
+        </ul>
+      </nav>
+    </div>
+  </div>
+</body>
+</html>

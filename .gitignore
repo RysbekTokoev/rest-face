@@ -1,0 +1,7 @@
+.idea
+config/known/
+config/main/migrations/
+config/db.sqlite3
+*.pyc
+config/db.sqlite3
+*.bak
