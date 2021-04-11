@@ -43,10 +43,12 @@ python3 manage.py runserver
 and fill the given form. <b>THERE MUST BE ONLY ONE PERSON ON THE IMAGE</b>
 - To recognize faces from image use http://127.0.0.1:8000/api/getface/
 - There also an example of how this api can be used, check http://127.0.0.1:8000/tester
-[gif]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 2"
-  
+![alt text][gif]
+
 ## Contacts
 Rysbek Tokoev \
 [rysbek@tokoev.com](mailto:rysbek@tokoev.com) \
 [Linkedin](https://www.linkedin.com/in/rysbek-tokoev-44197919a/) \
 [Facebook](https://www.facebook.com/tokoevr/)
+
+[gif]: https://github.com/RysbekTokoev/rest-face/blob/main/testing_example.gif "Logo Title Text 2"
