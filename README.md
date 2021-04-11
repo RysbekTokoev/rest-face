@@ -39,7 +39,7 @@ python3 manage.py migrate main
 python3 manage.py runserver
 ```
 ## 2. Usage
-- To add new face into the database post username and image to <i><b>/api/face/</i></b>, if you doing it by hand, open http://127.0.0.1:800
+- To add new face into the database post username and image to <i><b>/api/face/</i></b>, if you doing it by hand, open http://127.0.0.1:8000/api/face/
 and fill the given form. <b>THERE MUST BE ONLY ONE PERSON ON THE IMAGE</b>
 - To recognize faces from image use http://127.0.0.1:8000/api/getface/
 - There also an example of how this api can be used, check http://127.0.0.1:8000/tester
