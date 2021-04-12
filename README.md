@@ -39,10 +39,10 @@ python3 manage.py migrate main
 python3 manage.py runserver
 ```
 ## 2. Usage
-- To add new face into the database post username and image to <i><b>/api/face/</i></b>, if you doing it by hand, open /api/face/
+- To add new face into the database post username and image to <b>/api/face/</b>, if you doing it by hand, open /api/face/
 and fill the given form. <b>THERE MUST BE ONLY ONE PERSON ON THE IMAGE</b>
-- To recognize faces from image use /api/getface/
-- There also an example of how this api can be used, check /tester
+- To recognize faces from image use <b>/api/getface/</b>
+- There also an example of how this api can be used, check <b>/tester</b>
 ![alt text][gif]
 
 ## Contacts
