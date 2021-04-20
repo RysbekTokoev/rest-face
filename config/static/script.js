@@ -68,5 +68,5 @@ video.addEventListener('play', () => {
         })
       })
     }
-  }, 500) //check every half of a second
+  }, 300) //check every half of a second
 })

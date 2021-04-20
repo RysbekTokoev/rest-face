@@ -37,7 +37,6 @@ def compare_faces(stream=None, url=None, encoding=None):
         result = np.linalg.norm(np.frombuffer(face.encoding) - encoding) <= TOLERANCE
         if result:
             name = face.username
-            print(name)
     return name
 
 
