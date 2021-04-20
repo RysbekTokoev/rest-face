@@ -20,9 +20,16 @@ class FaceSerializer(serializers.ModelSerializer):
         return instance
 
 
-class PostFaceSerializer(serializers.Serializer):
+class PostFace(serializers.Serializer):
     file = serializers.FileField(allow_empty_file=True, allow_null=True)
     url = serializers.CharField(allow_blank=True, allow_null=True)
 
     class Meta:
         fields = ['file_uploaded']
+
+
+class PostEncoding(serializers.Serializer):
+    encoding = serializers.CharField(allow_blank=True, allow_null=True)
+
+    class Meta:
+        fields = ["encoding"]

@@ -2,5 +2,6 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-router.register(r'getface', views.FaceViewSet, basename='getface')
-router.register(r'face', views.FaceListViewSet, basename='face')
+router.register(r'fromimage', views.FromImageViewSet, basename='fromimage')
+router.register(r'fromencoding', views.FromEncodingViewSet, basename='fromencoding')
+router.register(r'face', views.FaceViewSet, basename='face')

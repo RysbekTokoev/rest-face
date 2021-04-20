@@ -20,17 +20,25 @@ def grab_image(path=None, stream=None, url=None):
     return image
 
 
-TOLERANCE = 0.7
-def compare_faces(stream=None, url=None):
-    image = grab_image(stream=stream, url=url)
-    locations = face_recognition.face_locations(image)
-    encoding = face_recognition.face_encodings(image, locations)
+TOLERANCE = 0.6
+def compare_faces(stream=None, url=None, encoding=None):
+    name = "unknown face"
+    faces = Face.objects.all()
+
     if encoding:
-        for face in Face.objects.all():
-            results = face_recognition.compare_faces([encoding], np.frombuffer(face.encoding), TOLERANCE)
-            if True in results:
-                return face.username
-    return "unknown face"
+        encoding = list(encoding.values())
+
+    elif stream is not None or url is not None:
+        image = grab_image(stream=stream, url=url)
+        locations = face_recognition.face_locations(image)
+        encoding = face_recognition.face_encodings(image, locations)
+
+    for face in faces:
+        result = np.linalg.norm(np.frombuffer(face.encoding) - encoding) <= TOLERANCE
+        if result:
+            name = face.username
+            print(name)
+    return name
 
 
 def get_encoding(fullpath):

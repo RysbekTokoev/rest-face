@@ -2,8 +2,10 @@ const video = document.getElementById('video')
 const log = document.getElementById('log')
 
 Promise.all([
-  faceapi.nets.tinyFaceDetector.loadFromUri('./static/models/'),
+  faceapi.nets.ssdMobilenetv1.loadFromUri('./static/models/'),
+  // faceapi.nets.tinyFaceDetector.loadFromUri('./static/models/'),
   faceapi.nets.faceLandmark68Net.loadFromUri('./static/models/'),
+  faceapi.nets.faceRecognitionNet.loadFromUri('./static/models/')
 ]).then(startVideo)
 
 function startVideo() {
@@ -32,14 +34,14 @@ function getCookie(name) {
 }const csrftoken = getCookie('csrftoken');
 
 function sendFace(detected){
-  const Url = '/api/getface/';
+  const Url = '/api/fromencoding/';
   let otherPram={
     method: "POST",
     headers: {
       'X-CSRFToken': csrftoken,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({'url': detected}),
+    body: JSON.stringify({'encoding': detected}),
   }
   return fetch(Url, otherPram).then(data => {return data.json()});
 }
@@ -53,19 +55,17 @@ video.addEventListener('play', () => {
   faceapi.matchDimensions(canvas, displaySize)
 
   setInterval(async () => {
-    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks()
+    const detections = await faceapi.detectAllFaces(video, new faceapi.SsdMobilenetv1Options()).withFaceLandmarks().withFaceDescriptors()
     canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
-
     if (detections.length > 0) {
       const resizedDetections = faceapi.resizeResults(detections, displaySize)
       faceapi.draw.drawDetections(canvas, resizedDetections)
-
-      let faceImages = await faceapi.extractFaces(video, [new faceapi.Rect(0, 0, canvas.width, canvas.height)])
-
-      sendFace(faceImages[0].toDataURL()).then(data => {
-        let li = document.createElement('li');
-        li.appendChild(document.createTextNode(data))
-        $(li).prependTo($(log));
+      resizedDetections.forEach(fd => {
+        sendFace(fd.descriptor).then(data => {
+          let li = document.createElement('li');
+          li.appendChild(document.createTextNode(data))
+          $(li).prependTo($(log));
+        })
       })
     }
   }, 500) //check every half of a second
