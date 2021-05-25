@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  config:
+    volumes:
+      - static:/static
+    build:
+      dockerfile: DockerFile
+      context: .
+    ports:
+      - "8000:8000"
+
+  nginx:
+    build: 
+        context: ./nginx
+        dockerfile: DockerFile
+    volumes:
+      - static:/static
+    ports:
+      - "80:80"
+    depends_on:
+      - config
+volumes:
+  static:

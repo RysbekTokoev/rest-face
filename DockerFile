@@ -1,0 +1,19 @@
+FROM python:3
+
+RUN pip install --upgrade pip
+RUN apt-get update && apt-get -y install cmake protobuf-compiler
+
+COPY ./requirements.txt .
+RUN apt-get update && apt-get install -y python3-opencv
+RUN pip install -r requirements.txt
+
+COPY ./config /app
+
+WORKDIR /app
+
+COPY ./entrypoint.sh /
+RUN python manage.py makemigrations
+RUN python manage.py makemigrations main
+RUN python manage.py migrate
+ENTRYPOINT ["sh", "/entrypoint.sh"]
+
