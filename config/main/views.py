@@ -22,7 +22,7 @@ class FromImageViewSet(viewsets.ViewSet):
 
     def list(self, request):
         return Response({})
-
+ 
     def create(self, request):
         url = request.data['url']
         if url:
