@@ -30,9 +30,8 @@ If any troubles with installing face_recognition check the [github page](https:/
 1.3 After prerequisites installed go to the <i><b><download-path>/config/</i></b> and run this to create a database:
 ```
 python3 manage.py makemigrations
-python3 manage.py migrate
 python3 manage.py makemigrations main
-python3 manage.py migrate main
+python3 manage.py migrate
 ```
 1.4 Run the project:
 ```
