@@ -1,4 +1,4 @@
-Django==3.2
+Django==3.2.15
 django-resized==0.3.11
 djangorestframework==3.12.4
 dlib==19.22.0
