@@ -1,5 +1,5 @@
 .idea
-config/known/
+config/media/known/
 config/main/migrations/
 config/db.sqlite3
 *.pyc

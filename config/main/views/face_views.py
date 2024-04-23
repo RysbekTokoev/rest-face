@@ -2,9 +2,9 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import permissions
 from django.shortcuts import render
-from .models import Face
-from .serializers import FaceSerializer, PostFace, PostEncoding
-from .image_utils import compare_faces
+from main.models import Face
+from main.serializers import FaceSerializer, PostFace, PostEncoding
+from main.image_utils import compare_faces
 
 
 def tester(request):
@@ -22,7 +22,7 @@ class FromImageViewSet(viewsets.ViewSet):
 
     def list(self, request):
         return Response({})
- 
+
     def create(self, request):
         url = request.data['url']
         if url:

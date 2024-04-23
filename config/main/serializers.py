@@ -1,4 +1,4 @@
-from .models import Face
+from .models import Face, Emotion, Recognition, Settings, Portal
 from rest_framework import serializers
 from .image_utils import get_encoding
 import os

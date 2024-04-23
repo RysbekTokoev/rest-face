@@ -1,5 +1,5 @@
 from rest_framework import routers
-from . import views
+from main import views
 
 router = routers.DefaultRouter()
 router.register(r'fromimage', views.FromImageViewSet, basename='fromimage')
