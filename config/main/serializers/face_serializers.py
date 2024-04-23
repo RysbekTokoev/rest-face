@@ -1,6 +1,6 @@
-from .models import Face, Emotion, Recognition, Settings, Portal
+from main.models import Face
 from rest_framework import serializers
-from .image_utils import get_encoding
+from main.image_utils import get_encoding
 import os
 
 

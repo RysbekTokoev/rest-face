@@ -7,3 +7,4 @@ config/db.sqlite3
 *.bak
 config/config/settings.py
 config/config/settings.py
+/dlib/
