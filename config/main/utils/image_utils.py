@@ -2,7 +2,7 @@ import cv2
 import urllib
 import numpy as np
 import face_recognition
-from .models import Face
+from main.models import Face
 
 
 def grab_image(path=None, stream=None, url=None):
@@ -21,8 +21,7 @@ def grab_image(path=None, stream=None, url=None):
 
 
 TOLERANCE = 0.6
-def compare_faces(stream=None, url=None, encoding=None):
-    name = "unknown face"
+def recognize_face(stream=None, url=None, encoding=None):
     faces = Face.objects.all()
 
     if encoding:
@@ -36,8 +35,8 @@ def compare_faces(stream=None, url=None, encoding=None):
     for face in faces:
         result = np.linalg.norm(np.frombuffer(face.encoding) - encoding) <= TOLERANCE
         if result:
-            name = face.username
-    return name
+            return face
+    return None
 
 
 def get_encoding(fullpath):

@@ -1,10 +1,11 @@
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import permissions
 from django.shortcuts import render
-from main.models import Face
-from main.serializers import FaceSerializer, PostFace, PostEncoding
-from main.image_utils import compare_faces
+from main.models import Face, Recognition
+from main.serializers import FaceSerializer
+from main.utils.image_utils import recognize_face
 
 
 def tester(request):
@@ -14,36 +15,36 @@ def tester(request):
 class FaceViewSet(viewsets.ModelViewSet):
     queryset = Face.objects.all()
     serializer_class = FaceSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
+    @action(detail=False, methods=['post'], name='recognize', url_path='recognize')
+    def recognize(self, request):
+        portal = request.data.get('portal', None)
+        if portal is None:
+            return Response("No portal provided")
 
-class FromImageViewSet(viewsets.ViewSet):
-    serializer_class = PostFace
-
-    def list(self, request):
-        return Response({})
-
-    def create(self, request):
-        url = request.data['url']
-        if url:
-            response = compare_faces(url=url)
+        if request.data.get('url', None):
+            face = recognize_face(url=request.data.get('url', None))
         elif request.FILES.get('file'):
-            response = compare_faces(stream=request.FILES.get('file'))
-        else:
-            response = "No image uploaded"
-        return Response(response)
-
-
-class FromEncodingViewSet(viewsets.ViewSet):
-    serializer_class = PostEncoding
-
-    def list(self, request):
-        return Response({})
-
-    def create(self, request):
-        encoding = request.data['encoding']
-        if encoding:
-            response = compare_faces(encoding=encoding)
-            return Response(response)
+            face = recognize_face(stream=request.FILES.get('file'))
+        elif request.data.get('encoding'):
+            face = recognize_face(encoding=request.data['encoding'])
         else:
             return Response("No data provided")
+
+        recognition = Recognition.objects.create(face=face if face else None)
+        if face:
+            response = {
+                'face': recognition.face.id,
+                'name': recognition.face.name,
+                'time': recognition.created_at,
+                }
+            response.update({'emotion': recognition.face.emotion}) if recognition.face.emotion else None
+        else:
+            response = {
+                'face': None,
+                'name': 'unknown',
+                'time': recognition.created_at,
+            }
+
+        return Response(response)

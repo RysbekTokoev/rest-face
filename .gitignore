@@ -8,3 +8,7 @@ config/db.sqlite3
 config/config/settings.py
 config/config/settings.py
 /dlib/
+/config/media/
+/config/portal/migrations/
+**/migrations/
+/dlib/

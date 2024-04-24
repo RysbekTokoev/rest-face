@@ -34,14 +34,14 @@ function getCookie(name) {
 }const csrftoken = getCookie('csrftoken');
 
 function sendFace(detected){
-  const Url = '/api/fromencoding/';
+  const Url = '/api/face/recognize_face/';
   let otherPram={
     method: "POST",
     headers: {
       'X-CSRFToken': csrftoken,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({'encoding': detected}),
+    body: JSON.stringify({'encoding': detected, 'portal': 'test'}),
   }
   return fetch(Url, otherPram).then(data => {return data.json()});
 }

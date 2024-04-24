@@ -1,1 +1,1 @@
-from .face_serializers import FaceSerializer, PostFace, PostEncoding
+from .face_serializers import FaceSerializer

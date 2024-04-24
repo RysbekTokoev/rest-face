@@ -1,7 +1,7 @@
 from django.urls import include, path
 from .routers import *
 
-app_name = 'main'
+app_name = 'portal'
 urlpatterns = [
-    path('main/', include(router.urls)),
+    path('portal/', include(router.urls)),
 ]

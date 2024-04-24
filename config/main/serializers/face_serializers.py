@@ -1,18 +1,21 @@
 from main.models import Face
 from rest_framework import serializers
-from main.image_utils import get_encoding
-import os
+from main.utils.image_utils import get_encoding
+from django.conf import settings
 
 
 class FaceSerializer(serializers.ModelSerializer):
+    url = serializers.CharField(source='get_absolute_url', read_only=True)
+
     class Meta:
         model = Face
-        fields = "__all__"
+        exclude = ('encoding',)
 
     def create(self, validated_data):
         instance = super().create(validated_data)
 
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        BASE_DIR = settings.BASE_DIR
+
         fullpath = BASE_DIR + instance.image.url
 
         instance.encoding = get_encoding(fullpath)
@@ -20,16 +23,3 @@ class FaceSerializer(serializers.ModelSerializer):
         return instance
 
 
-class PostFace(serializers.Serializer):
-    file = serializers.FileField(allow_empty_file=True, allow_null=True)
-    url = serializers.CharField(allow_blank=True, allow_null=True)
-
-    class Meta:
-        fields = ['file_uploaded']
-
-
-class PostEncoding(serializers.Serializer):
-    encoding = serializers.CharField(allow_blank=True, allow_null=True)
-
-    class Meta:
-        fields = ["encoding"]
