@@ -10,6 +10,7 @@ import Badge from "@mui/material/Badge";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import * as React from "react";
 import {useGetOpen} from "./PageTemplate";
+import Link from "@mui/material/Link";
 
 
 interface AppBarProps extends MuiAppBarProps {
@@ -63,7 +64,9 @@ export default function AppBar({toggleDrawer}: {toggleDrawer: () => void}){
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard
+                <Link href="/" color="inherit" underline="none">
+                    REST-Face
+                </Link>
             </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">

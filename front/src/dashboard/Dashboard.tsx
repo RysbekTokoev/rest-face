@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Chart from './Chart';
 import Deposits from './Deposits';
-import Recognitions from './Recognitions';
+import RecognitionsTable from './RecognitionsTable';
 import PageTemplate from "../common/PageTemplate";
 
 
@@ -42,7 +42,7 @@ function Dashboard() {
               {/* Recent Orders */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Recognitions />
+                  <RecognitionsTable />
                 </Paper>
               </Grid>
             </Grid>

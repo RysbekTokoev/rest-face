@@ -8,6 +8,7 @@ import CameraIcon from '@mui/icons-material/Camera';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PersonIcon from '@mui/icons-material/Person';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 function ListButton({url, text, icon}: {url: string, text: string, icon: any}){
     return <a href={url} style={{
@@ -25,35 +26,21 @@ function ListButton({url, text, icon}: {url: string, text: string, icon: any}){
 
 export const mainListItems = (
   <React.Fragment>
-    <ListButton url="/" text="Dashboard" icon={<DashboardIcon/>} />
-    <ListButton url="/camera" text="Camera" icon={<CameraIcon/>} />
-    <ListButton url="/face" text="Face" icon={<PersonIcon/>} />
-    <ListButton url="/settings" text="Settings"  icon={<SettingsIcon/>} />
+    <ListButton url="/" text="Главная" icon={<DashboardIcon/>} />
+    <ListButton url="/recognitions/" text="Распознавания"  icon={<VisibilityIcon/>} />
+    <ListButton url="/camera/" text="Камера" icon={<CameraIcon/>} />
+    <ListButton url="/faces/" text="Лица" icon={<PersonIcon/>} />
+    <ListButton url="/settings/" text="Настройки"  icon={<SettingsIcon/>} />
   </React.Fragment>
 );
 
 export const secondaryListItems = (
   <React.Fragment>
     <ListSubheader component="div" inset>
-      Saved reports
+      Сохраненные отчеты
     </ListSubheader>
-    <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Current month" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Last quarter" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Year-end sale" />
-    </ListItemButton>
+    <ListButton url="/" text="За день" icon={<AssignmentIcon/>}/>
+    <ListButton url="/" text="За месяц" icon={<AssignmentIcon/>}/>
+    <ListButton url="/" text="За год" icon={<AssignmentIcon/>}/>
   </React.Fragment>
 );
