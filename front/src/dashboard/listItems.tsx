@@ -4,44 +4,31 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import PeopleIcon from '@mui/icons-material/People';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import LayersIcon from '@mui/icons-material/Layers';
+import CameraIcon from '@mui/icons-material/Camera';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import SettingsIcon from '@mui/icons-material/Settings';
+import PersonIcon from '@mui/icons-material/Person';
+
+function ListButton({url, text, icon}: {url: string, text: string, icon: any}){
+    return <a href={url} style={{
+        textDecoration: 'none',
+        color: 'inherit'
+    }}>
+        <ListItemButton>
+            <ListItemIcon>
+                {icon}
+            </ListItemIcon>
+            <ListItemText primary={text}/>
+        </ListItemButton>
+    </a>
+};
 
 export const mainListItems = (
   <React.Fragment>
-    <ListItemButton>
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <ListItemText primary="Dashboard" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <ShoppingCartIcon />
-      </ListItemIcon>
-      <ListItemText primary="Orders" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <PeopleIcon />
-      </ListItemIcon>
-      <ListItemText primary="Customers" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <BarChartIcon />
-      </ListItemIcon>
-      <ListItemText primary="Reports" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <LayersIcon />
-      </ListItemIcon>
-      <ListItemText primary="Integrations" />
-    </ListItemButton>
+    <ListButton url="/" text="Dashboard" icon={<DashboardIcon/>} />
+    <ListButton url="/camera" text="Camera" icon={<CameraIcon/>} />
+    <ListButton url="/face" text="Face" icon={<PersonIcon/>} />
+    <ListButton url="/settings" text="Settings"  icon={<SettingsIcon/>} />
   </React.Fragment>
 );
 

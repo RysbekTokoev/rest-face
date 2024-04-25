@@ -59,16 +59,16 @@ function preventDefault(event: React.MouseEvent) {
   event.preventDefault();
 }
 
-export default function Orders() {
+export default function Recognitions() {
   return (
     <React.Fragment>
-      <Title>Recent Orders</Title>
+      <Title>Недавние распознования</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Ship To</TableCell>
+            <TableCell>Время</TableCell>
+            <TableCell>Имя</TableCell>
+            <TableCell>Камера</TableCell>
             <TableCell>Payment Method</TableCell>
             <TableCell align="right">Sale Amount</TableCell>
           </TableRow>
