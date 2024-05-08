@@ -29,8 +29,9 @@ class Face(models.Model):
 class Recognition(models.Model):
     id = models.AutoField(primary_key=True)
     face = models.ForeignKey(Face, on_delete=models.CASCADE, null=True, blank=True)
+    camera = models.ForeignKey('portal.Camera', on_delete=models.CASCADE, null=True, blank=True)
     emotion = models.ForeignKey(Emotion, on_delete=models.SET_NULL, null=True, blank=True)
-    time = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def get_absolute_url(self):
         return f"http://127.0.0.1:8000/api/main/recognition/{self.id}/"

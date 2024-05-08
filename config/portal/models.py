@@ -51,3 +51,12 @@ class PortalUser(models.Model):
 
     class Meta:
         unique_together = [['portal', 'user']]
+
+
+class Camera(models.Model):
+    id = models.AutoField(primary_key=True)
+    portal = models.ForeignKey(Portal, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.portal.name} - {self.name}"
