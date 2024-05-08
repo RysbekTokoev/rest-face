@@ -1,21 +1,79 @@
 import * as React from "react";
 import { ChangeEventHandler, MutableRefObject, RefObject, useEffect, useRef, useState } from 'react';
-
 import * as faceapi from 'face-api.js';
+import axios from 'axios';
+
 import Webcam from 'react-webcam';
 
-import './Ai.css';
+import './Ai.scss';
 
-interface AiProps {
-    gradientCallback: Function;
+function getCookie(name: string) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 
-function Ai( { gradientCallback }: AiProps) {
+// create props
+interface AiProps {
+    recognitionCallback: (name: string) => void;
+}
+
+function Ai({ recognitionCallback }: AiProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const cameraCanvas = useRef<HTMLCanvasElement>(null);
 
     const [results, setResults] = useState<Array<any> | undefined>(undefined);
     const [loading, setLoading] = useState(false);
+    const Url: string = 'http://127.0.0.1:8000/api/main/faces/recognize/';
+    const csrftoken: string | null = getCookie('csrftoken');
+    const lastRecognizedName = useRef<string | null>(null);
+    const lastRecognitionTime = useRef<number>(Date.now());
+
+
+    function sendFace(detected: any){
+        let body={
+            encoding: detected,
+            portal: 'test',
+        }
+
+        return axios.post(Url, body, {
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            }
+        })
+          .then(function (response) {
+            // if response status is 200 then add name to the #recognized ul list
+            // if response status is 200 then add name to the #recognized ul list
+            if (response.status === 200) {
+                const recognizedName = response.data.name;
+                const currentTime = Date.now();
+
+                // Only call recognitionCallback if the recognized name is new and it's been at least one second since the last recognition
+                if (recognizedName !== lastRecognizedName.current && currentTime - lastRecognitionTime.current >= 1000) {
+                    console.log({recognizedName, currentTime, lastRecognizedName, lastRecognitionTime});
+                    lastRecognizedName.current = recognizedName;
+                    lastRecognitionTime.current = currentTime;
+                    recognitionCallback(recognizedName);
+                }
+            }
+
+
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+    }
+
     async function detectFaces(image: HTMLVideoElement | HTMLImageElement): Promise<Array<any>> {
         if (!image) {
             console.log('no image')
@@ -34,7 +92,8 @@ function Ai( { gradientCallback }: AiProps) {
             .detectAllFaces(image, new faceapi.TinyFaceDetectorOptions({ inputSize: 320 }))
             .withFaceLandmarks()
             .withFaceExpressions()
-            .withAgeAndGender();
+            .withAgeAndGender()
+            .withFaceDescriptors();
 
         return faceapi.resizeResults(faces, displaySize);
     };
@@ -75,7 +134,7 @@ function Ai( { gradientCallback }: AiProps) {
             await drawResults(videoRef.current/* .video */, cameraCanvas.current!, faces);
             setResults(faces);
             if (faces.length > 0) {
-                gradientCallback(faces);
+                sendFace(faces[0].descriptor)
             }
         }
         console.log('finished get faces')
@@ -86,7 +145,6 @@ function Ai( { gradientCallback }: AiProps) {
 
     const clearOverlay = (canvas: any) => {
         canvas.current.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-        gradientCallback(undefined);
     };
 
     let [isCameraOn, setIsCameraOn] = useState<boolean>(false);
@@ -153,10 +211,8 @@ function Ai( { gradientCallback }: AiProps) {
 
         if (faces.length === 0) {
             console.log('no faces')
-            gradientCallback(undefined);
             return;
         } else {
-            gradientCallback(faces);
         }
 
         const canvas = imgCanvas.current;
@@ -194,20 +250,10 @@ function Ai( { gradientCallback }: AiProps) {
             if (videoRef !== null && videoRef !== undefined) {
                 intervalRef.current = setInterval(async () => {
                     await getFaces();
-                    /* if (loading) {
-                        setLoading(false)
-                    } */
                     console.log(captureVideo);
                 }, 100);
                 console.log(intervalRef.current)
-                /* return () => {
-                    clearOverlay(cameraCanvas);
-                    clearInterval(ticking);
-                }; */
-            } /* else {
-                clearInterval(ticking);
-                return clearOverlay(cameraCanvas);
-            } */
+            }
         } else {
             console.log('pong')
             console.log(captureVideo)
@@ -287,11 +333,11 @@ function Ai( { gradientCallback }: AiProps) {
                         </div>
                     </div>
                 }
-                {
-                    !fileUploadProcessing ?
-                        <button onClick={startFile}>upload file</button>
-                        : <button onClick={cancelFile}>cancel upload</button>
-                }
+                {/*{*/}
+                {/*    !fileUploadProcessing ?*/}
+                {/*        <button onClick={startFile}>upload file</button>*/}
+                {/*        : <button onClick={cancelFile}>cancel upload</button>*/}
+                {/*}*/}
             </div>
         </div>
     );

@@ -2,9 +2,20 @@ import * as React from "react";
 import { useEffect, useRef, useState } from 'react';
 
 import * as faceapi from 'face-api.js';
-import Webcam from 'react-webcam';
 import Ai from './Ai';
-import './App.css';
+import './App.scss';
+import PageTemplate from "../common/PageTemplate";
+
+
+
+const Recognitions = () => {
+	return (
+		<div>
+			<ul id="recognized">
+			</ul>
+		</div>
+	)
+}
 
 const Camera = () => {
 
@@ -60,23 +71,30 @@ const Camera = () => {
 		setCurrentEmotion(emotion);
 	}
 
+	function addRecognition(result: any) {
+		let recognized = document.getElementById('recognized');
+		if (recognized) {
+			let li = document.createElement('li');
+			li.innerHTML = result;
+			recognized.appendChild(li);
+		}
+	}
+
 	return (
-		<>
-			<div className={`gradient t ${currentEmotion as string}`}></div>
+		<PageTemplate>
 			<div className="app">
-				<div className='emotion'>
-					{
-						hasResult ? currentEmotion : 'emotion ai'
-					}
-				</div>
-				{
-					ready ? <Ai gradientCallback={handleGradient}/> : 'loading...'
-				}
-				<div className='credits'>
-					<span>@s-alad&nbsp;|&nbsp;</span> 
-					<a href=''>github</a>
+				<div className="camera-container">
+					<div className='camera-section'>
+						<div className='emotion'></div>
+						{
+							ready ? <Ai recognitionCallback={addRecognition}/> : 'loading...'
+						}
+					</div>
+					<div className='recognition-section'>
+						<Recognitions />
+					</div>
 				</div>
 			</div>
-		</>
+		</PageTemplate>
 	);
 }; export default Camera;

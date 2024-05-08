@@ -105,7 +105,20 @@
     }
 }
 
-/* This is just to transition when you change the viewport size. */
-* {
-    transition: all 0.25s ease-out;
+.camera-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.camera-section {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.recognition-section {
+    width: 50%;
 }
