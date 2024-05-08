@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {createContext, useContext} from 'react';
+import {createContext, useContext, useEffect, useState} from 'react';
 import AppBar from "./AppBar";
 import Drawer from "./Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -8,6 +8,9 @@ import Box from '@mui/material/Box';
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import Toolbar from "@mui/material/Toolbar";
+import IUser from "../../react-typescript-authentication-example/src/types/user.type";
+import * as AuthService from "../../react-typescript-authentication-example/src/services/auth.service";
+import EventBus from "../../react-typescript-authentication-example/src/common/EventBus";
 
 
 const Context = createContext<boolean>(true);
