@@ -15,11 +15,12 @@ def tester(request):
 class FaceViewSet(viewsets.ModelViewSet):
     queryset = Face.objects.all()
     serializer_class = FaceSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     @action(detail=False, methods=['post'], name='recognize', url_path='recognize')
     def recognize(self, request):
         portal = request.data.get('portal', None)
+
         if portal is None:
             return Response("No portal provided")
 
@@ -32,14 +33,19 @@ class FaceViewSet(viewsets.ModelViewSet):
         else:
             return Response("No data provided")
 
-        recognition = Recognition.objects.create(face=face if face else None)
+        recognition = Recognition.objects.create(
+            face=face if face else None,
+            emotion=request.data.get('emotion', None),
+            camera=request.data.get('camera', None)
+        )
+
         if face:
             response = {
                 'face': recognition.face.id,
-                'name': recognition.face.name,
+                'name': recognition.face.username,
                 'time': recognition.created_at,
                 }
-            response.update({'emotion': recognition.face.emotion}) if recognition.face.emotion else None
+            response.update({'emotion': recognition.emotion}) if recognition.emotion else None
         else:
             response = {
                 'face': None,
