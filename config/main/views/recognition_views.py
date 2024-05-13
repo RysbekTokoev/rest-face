@@ -16,8 +16,8 @@ class RecognitionViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at']
 
     def filter_queryset(self, queryset):
-        if "portal" in self.request.query_params:
-            portal = self.request.query_params["portal"]
-            queryset = queryset.filter(face__portal=portal)
-        return super().filter_queryset(queryset)
+        user = self.request.user
+        portal = user.portaluser.portal
 
+        queryset = queryset.filter(face__portal=portal)
+        return super().filter_queryset(queryset)

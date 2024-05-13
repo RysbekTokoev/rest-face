@@ -10,18 +10,34 @@ import Link from "@mui/material/Link";
 import axios from "axios";
 
 
-const URL = "http://127.0.0.1:8000/api/main/recognitions/?ordering=created_at&portal=1";
+const URL = "http://127.0.0.1:8000/api/main/recognitions/";
 interface Recognition {
   id: number;
-  name: string;
-  email: string;
+  face: string;
+  emotion: string;
+  camera: string;
+  created_at: string;
 }
 
 function preventDefault(event: React.MouseEvent) {
   event.preventDefault();
 }
 
-function Recognitions() {
+const Recognitions = () => {
+  const [rows, setRows]: [Recognition[], (rows: Recognition[]) => void] = React.useState<Recognition[]>([]);
+
+
+  React.useEffect(() => {
+    axios
+      .get(URL, {
+        headers: {
+          "Content-Type": "application/json"
+        },
+      }).then(response => {
+        setRows(response.data.results);
+      });
+  }, []);
+
   return (
   <PageTemplate>
     <React.Fragment>
@@ -29,23 +45,23 @@ function Recognitions() {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Время</TableCell>
+            <TableCell>Id</TableCell>
             <TableCell>Имя</TableCell>
             <TableCell>Камера</TableCell>
-            <TableCell>Payment Method</TableCell>
-            <TableCell align="right">Sale Amount</TableCell>
+            <TableCell>Эмоция</TableCell>
+            <TableCell align="right">Время</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {/*{rows.map((row) => (*/}
-          {/*  <TableRow key={row.id}>*/}
-          {/*    <TableCell>{row.date}</TableCell>*/}
-          {/*    <TableCell>{row.name}</TableCell>*/}
-          {/*    <TableCell>{row.shipTo}</TableCell>*/}
-          {/*    <TableCell>{row.paymentMethod}</TableCell>*/}
-          {/*    <TableCell align="right">{`$${row.amount}`}</TableCell>*/}
-          {/*  </TableRow>*/}
-          {/*))}*/}
+          {rows.map((row) => (
+            <TableRow key={row.id}>
+              <TableCell>{row.id}</TableCell>
+              <TableCell>{row.face}</TableCell>
+              <TableCell>{row.camera}</TableCell>
+              <TableCell>{row.emotion}</TableCell>
+              <TableCell align="right">{row.created_at}</TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
       <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>

@@ -34,15 +34,15 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
     const [loading, setLoading] = useState(false);
     const Url: string = 'http://127.0.0.1:8000/api/main/faces/recognize/';
     const csrftoken: string | null = getCookie('csrftoken');
-    const lastRecognizedName = useRef<string | null>(null);
+    const lastRecognized = useRef<Float32Array>(new Float32Array(0));
     const lastRecognitionTime = useRef<number>(Date.now());
 
 
-    function sendFace(detected: any){
+    function sendFace(detected: Float32Array, emotion: string){
         let body={
             encoding: detected,
-            portal: 'test',
-            camera: ''
+            emotion: emotion,
+            camera: cameraId
         }
 
         return axios.post(Url, body, {
@@ -56,18 +56,11 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
             // if response status is 200 then add name to the #recognized ul list
             if (response.status === 200) {
                 const recognizedName = response.data.name;
-                const currentTime = Date.now();
-
                 // Only call recognitionCallback if the recognized name is new and it's been at least one second since the last recognition
-                if (recognizedName !== lastRecognizedName.current && currentTime - lastRecognitionTime.current >= 1000) {
-                    console.log({recognizedName, currentTime, lastRecognizedName, lastRecognitionTime});
-                    lastRecognizedName.current = recognizedName;
-                    lastRecognitionTime.current = currentTime;
-                    recognitionCallback(recognizedName);
-                }
+                lastRecognitionTime.current = Date.now();
+                lastRecognized.current = detected;
+                recognitionCallback(recognizedName);
             }
-
-
           })
           .catch(function (error) {
             console.log(error);
@@ -128,16 +121,29 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
     };
 
     async function getFaces(): Promise<void> {
-        console.log('get faces')
         if (videoRef.current !== null && videoRef.current !== undefined) {
             const faces: Array<any> = await detectFaces(videoRef.current/* .video */);
             await drawResults(videoRef.current/* .video */, cameraCanvas.current!, faces);
             setResults(faces);
+
             if (faces.length > 0) {
-                sendFace(faces[0].descriptor)
+                // TODO здесь могут быть настройки времени
+                // console.log(lastRecognized.current.length, Date.now() - lastRecognitionTime.current)
+                if (lastRecognized.current.length > 0 && Date.now() - lastRecognitionTime.current < 60*1000) {
+                    let faceMatcher = new faceapi.FaceMatcher(faces[0].descriptor);
+                    let match = faceMatcher.findBestMatch(lastRecognized.current)
+
+                    if (match.distance < 0.7) {
+                        console.log('old face')
+                        lastRecognized.current = faces[0].descriptor;
+                    } else {
+                        sendFace(faces[0].descriptor, faces[0].expressions.asSortedArray()[0].expression);
+                    }
+                } else {
+                    sendFace(faces[0].descriptor, faces[0].expressions.asSortedArray()[0].expression);
+                }
             }
         }
-        console.log('finished get faces')
         if (loading) {
             setLoading(false)
         }
@@ -214,8 +220,6 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
             .withFaceLandmarks()
             .withFaceExpressions()
             .withAgeAndGender()
-
-        console.log(faces)
 
         if (faces.length === 0) {
             console.log('no faces')
