@@ -6,7 +6,6 @@ axios.interceptors.response.use(resp => resp, async error => {
      refresh = true;
      console.log(localStorage.getItem('refresh_token'));
 
-     localStorage.removeItem('access_token');
      const response = await
            axios.post('http://127.0.0.1:8000/auth/jwt/refresh/', {
                refresh:localStorage.getItem('refresh_token')
@@ -26,8 +25,13 @@ return error;
 
 axios.interceptors.request.use(function (config) {
     const token = localStorage.getItem('access_token');
-    if (token)
-        config.headers.Authorization =  `JWT ${token}`;
-    else logout();
+    const refresh = localStorage.getItem('refresh_token');
+
+    // if url does not contain word refresh
+    if (config.url && config.url.indexOf('refresh') === -1) {
+        if (token)
+            config.headers.Authorization =  `JWT ${token}`;
+    }
+
     return config;
 });

@@ -162,6 +162,10 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
         }).catch((err) => {
             console.log(err)
         });
+
+        axios.patch(`http://127.0.0.1:8000/api/portal/camera/${cameraId}/`, {
+            status: 'online'
+        });
     }
     function stopCamera() {
         videoRef.current!.pause();
@@ -170,6 +174,10 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
         clearOverlay(cameraCanvas);
         setIsCameraOn(false);
         setResults(undefined);
+
+        axios.patch(`http://127.0.0.1:8000/api/portal/camera/${cameraId}/`, {
+            status: 'offline'
+        });
     }
 
     const imgCanvas: any = useRef();
