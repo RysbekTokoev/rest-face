@@ -11,7 +11,6 @@ axios.interceptors.response.use(resp => resp, async error => {
                refresh:localStorage.getItem('refresh_token')
            }, {
                headers: {'Content-Type': 'application/json' },
-               withCredentials: true
            });
     if (response.status === 200) {
        axios.defaults.headers.common['Authorization'] = `${response.data['access']}`;
