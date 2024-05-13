@@ -1,6 +1,6 @@
 // App.jsx
-import React, {useEffect, useState} from 'react';
-import {Link, Route, Routes} from 'react-router-dom';
+import React, {FC, useEffect, useState} from 'react';
+import {Link, Navigate, redirect, Route, Routes} from 'react-router-dom';
 import Dashboard from './dashboard/Dashboard';
 import IUser from "./types/user.type";
 import * as AuthService from "./services/auth.service";
@@ -10,8 +10,18 @@ import Camera from "./camera/Camera";
 import Faces from "./faces/Faces";
 import Settings from "./settings/Settings";
 import Login from "./user/Login";
-import Register from "./user/Register";
+import {getCurrentUser} from "./services/auth.service";
+import CameraList from "./camera/CameraList";
 
+
+const RequireAuth: FC<{ children: React.ReactElement }> = ({ children }) => {
+   const userIsLogged = getCurrentUser(); // Your hook to get login status
+
+   if (!userIsLogged) {
+      return Navigate({to: ("/login")})
+   }
+   return children;
+};
 
 function App() {
   const [showModeratorBoard, setShowModeratorBoard] = useState<boolean>(false);
@@ -23,8 +33,8 @@ function App() {
 
     if (user) {
       setCurrentUser(user);
-      setShowModeratorBoard(user.roles.includes("ROLE_MODERATOR"));
-      setShowAdminBoard(user.roles.includes("ROLE_ADMIN"));
+      // setShowModeratorBoard(user.roles.includes("ROLE_MODERATOR"));
+      // setShowAdminBoard(user.roles.includes("ROLE_ADMIN"));
     }
 
     EventBus.on("logout", logOut);
@@ -35,91 +45,54 @@ function App() {
     }, []);
 
     const logOut = () => {
-    AuthService.logout();
-    setShowModeratorBoard(false);
-    setShowAdminBoard(false);
-    setCurrentUser(undefined);
+      AuthService.logout();
+      // setShowModeratorBoard(false);
+      // setShowAdminBoard(false);
+      // setCurrentUser(undefined);
     };
 
   return (
-      <div>
-        {/*<nav className="navbar navbar-expand navbar-dark bg-dark">*/}
-        {/*  <Link to={"/"} className="navbar-brand">*/}
-        {/*    bezKoder*/}
-        {/*  </Link>*/}
-        {/*  <div className="navbar-nav mr-auto">*/}
-        {/*    <li className="nav-item">*/}
-        {/*      <Link to={"/home"} className="nav-link">*/}
-        {/*        Home*/}
-        {/*      </Link>*/}
-        {/*    </li>*/}
+      <div className="container mt-3">
+        <Routes>
+            <Route path="/login" element={
+                  <Login />
+            } />
+            <Route path="/" element={
+                <RequireAuth>
+                    <Dashboard />
+                </RequireAuth>
+            } />
 
-        {/*    {showModeratorBoard && (*/}
-        {/*        <li className="nav-item">*/}
-        {/*          <Link to={"/mod"} className="nav-link">*/}
-        {/*            Moderator Board*/}
-        {/*          </Link>*/}
-        {/*        </li>*/}
-        {/*    )}*/}
+            <Route path="recognitions/" element={
+              <RequireAuth>
+                  <Recognitions />
+              </RequireAuth>
+            } />
 
-        {/*    {showAdminBoard && (*/}
-        {/*        <li className="nav-item">*/}
-        {/*          <Link to={"/admin"} className="nav-link">*/}
-        {/*            Admin Board*/}
-        {/*          </Link>*/}
-        {/*        </li>*/}
-        {/*    )}*/}
+            <Route path="camera/" element={
+              <RequireAuth>
+                  <CameraList />
+              </RequireAuth>
+            } />
 
-        {/*    {currentUser && (*/}
-        {/*        <li className="nav-item">*/}
-        {/*          <Link to={"/user"} className="nav-link">*/}
-        {/*            User*/}
-        {/*          </Link>*/}
-        {/*        </li>*/}
-        {/*    )}*/}
-        {/*  </div>*/}
+            <Route path="camera/:id" element={
+              <RequireAuth>
+                  <Camera />
+              </RequireAuth>
+            } />
 
-        {/*  {currentUser ? (*/}
-        {/*      <div className="navbar-nav ml-auto">*/}
-        {/*        <li className="nav-item">*/}
-        {/*          <Link to={"/profile"} className="nav-link">*/}
-        {/*            {currentUser.username}*/}
-        {/*          </Link>*/}
-        {/*        </li>*/}
-        {/*        <li className="nav-item">*/}
-        {/*          <a href="/login" className="nav-link" onClick={logOut}>*/}
-        {/*            LogOut*/}
-        {/*          </a>*/}
-        {/*        </li>*/}
-        {/*      </div>*/}
-        {/*  ) : (*/}
-        {/*      <div className="navbar-nav ml-auto">*/}
-        {/*        <li className="nav-item">*/}
-        {/*          <Link to={"/login"} className="nav-link">*/}
-        {/*            Login*/}
-        {/*          </Link>*/}
-        {/*        </li>*/}
+            <Route path="faces/" element={
+              <RequireAuth>
+                  <Faces />
+              </RequireAuth>
+            } />
 
-        {/*        <li className="nav-item">*/}
-        {/*          <Link to={"/register"} className="nav-link">*/}
-        {/*            Sign Up*/}
-        {/*          </Link>*/}
-        {/*        </li>*/}
-        {/*      </div>*/}
-        {/*  )}*/}
-        {/*</nav>*/}
-
-        <div className="container mt-3">
-          <Routes>
-            <Route path="home/" element={<Dashboard />} />
-            <Route path="recognitions/" element={<Recognitions />} />
-            <Route path="camera/" element={<Camera />} />
-            <Route path="faces/" element={<Faces />} />
-            <Route path="Settings/" element={<Settings />} />
-            <Route path="login/" element={<Login />} />
-            <Route path="register/" element={<Register />} />
-          </Routes>
-        </div>
+            <Route path="settings/" element={
+              <RequireAuth>
+                  <Settings />
+              </RequireAuth>}
+            />
+        </Routes>
       </div>
   );
 }

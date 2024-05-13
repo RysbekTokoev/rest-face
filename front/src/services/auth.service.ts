@@ -1,32 +1,31 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/auth/";
-
-export const register = (username: string, email: string, password: string) => {
-  return axios.post(API_URL + "signup", {
-    username,
-    email,
-    password,
-  });
-};
+const API_URL = "http://localhost:8000/auth/jwt/";
 
 export const login = (username: string, password: string) => {
   return axios
-    .post(API_URL + "signin", {
+    .post(API_URL + "create", {
       username,
       password,
     })
     .then((response) => {
-      if (response.data.accessToken) {
+      if (response.data.access) {
+        console.log(JSON.stringify(response.data));
         localStorage.setItem("user", JSON.stringify(response.data));
-      }
 
+        localStorage.setItem('access_token', response.data.access);
+        localStorage.setItem('refresh_token', response.data.refresh);
+        axios.defaults.headers.common['Authorization'] =`Bearer ${response.data['access']}`;
+      }
       return response.data;
     });
 };
 
 export const logout = () => {
   localStorage.removeItem("user");
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  axios.defaults.headers.common['Authorization'] = null;
 };
 
 export const getCurrentUser = () => {
