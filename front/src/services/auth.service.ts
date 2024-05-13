@@ -15,7 +15,7 @@ export const login = (username: string, password: string) => {
 
         localStorage.setItem('access_token', response.data.access);
         localStorage.setItem('refresh_token', response.data.refresh);
-        axios.defaults.headers.common['Authorization'] =`Bearer ${response.data['access']}`;
+        axios.defaults.headers.common['Authorization'] =`JWT ${response.data['access']}`;
       }
       return response.data;
     });
