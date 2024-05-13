@@ -17,7 +17,6 @@ class CameraViewSet(viewsets.ModelViewSet):
         return queryset.filter(portal=user.portal)
 
     def update(self, request, *args, **kwargs):
-        print(request.user.id)
         user = request.user
         user = PortalUser.objects.get(user__id=user.id)
         instance = self.get_object()

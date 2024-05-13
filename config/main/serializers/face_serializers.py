@@ -1,7 +1,10 @@
-from main.models import Face
-from rest_framework import serializers
-from main.utils.image_utils import get_encoding
+from urllib.parse import unquote
+
 from django.conf import settings
+from rest_framework import serializers
+
+from main.models import Face
+from main.utils.image_utils import get_encoding
 
 
 class FaceSerializer(serializers.ModelSerializer):
@@ -16,7 +19,7 @@ class FaceSerializer(serializers.ModelSerializer):
 
         BASE_DIR = settings.BASE_DIR
 
-        fullpath = BASE_DIR + instance.image.url
+        fullpath = BASE_DIR + unquote(instance.image.url)
 
         instance.encoding = get_encoding(fullpath)
         instance.save()

@@ -1,11 +1,13 @@
+from django.shortcuts import render
+from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import permissions
-from django.shortcuts import render
-from main.models import Face, Recognition
+
+from main.models import Face, Recognition, Emotion
 from main.serializers import FaceSerializer
 from main.utils.image_utils import recognize_face
+from portal.models import Camera
 
 
 def tester(request):
@@ -19,10 +21,7 @@ class FaceViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], name='recognize', url_path='recognize')
     def recognize(self, request):
-        portal = request.data.get('portal', None)
-
-        if portal is None:
-            return Response("No portal provided")
+        user = request.user
 
         if request.data.get('url', None):
             face = recognize_face(url=request.data.get('url', None))
@@ -33,10 +32,15 @@ class FaceViewSet(viewsets.ModelViewSet):
         else:
             return Response("No data provided")
 
+        emotion = None
+        if request.data.get('emotion', None):
+            emotion = Emotion.objects.get_or_create(emotion=request.data['emotion'])[0]
+
+        camera = Camera.objects.get(id=request.data.get('camera', None))
         recognition = Recognition.objects.create(
             face=face if face else None,
-            emotion=request.data.get('emotion', None),
-            camera=request.data.get('camera', None)
+            emotion=emotion,
+            camera=camera
         )
 
         if face:
@@ -45,7 +49,7 @@ class FaceViewSet(viewsets.ModelViewSet):
                 'name': recognition.face.username,
                 'time': recognition.created_at,
                 }
-            response.update({'emotion': recognition.emotion}) if recognition.emotion else None
+            response.update({'emotion': recognition.emotion.emotion}) if recognition.emotion else None
         else:
             response = {
                 'face': None,
@@ -54,3 +58,10 @@ class FaceViewSet(viewsets.ModelViewSet):
             }
 
         return Response(response)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        portal = user.portaluser.portal
+        request.data._mutable = True
+        request.data['portal'] = portal.id
+        return super().create(request, *args, **kwargs)

@@ -38,7 +38,7 @@ class ProfileStatus(models.Model):
 class PortalUser(models.Model):
     id = models.AutoField(primary_key=True)
     portal = models.ForeignKey(Portal, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     status = models.ForeignKey(ProfileStatus, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -55,7 +55,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    instance.profile_user.save()
+    instance.portaluser.save()
 
 
 class Camera(models.Model):
