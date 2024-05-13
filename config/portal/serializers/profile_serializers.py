@@ -1,10 +1,10 @@
-from portal.models import Profile, ProfileStatus
+from portal.models import PortalUser, ProfileStatus
 from rest_framework import serializers
 
 
-class ProfileSerializer(serializers.ModelSerializer):
+class PortalUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Profile
+        model = PortalUser
         fields = "__all__"
 
 

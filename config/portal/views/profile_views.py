@@ -2,13 +2,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions
 from rest_framework.pagination import PageNumberPagination
 
-from portal.models import Profile
-from portal.serializers.profile_serializers import ProfileSerializer, ProfileStatusSerializer
+from portal.models import PortalUser, ProfileStatus
+from portal.serializers.profile_serializers import PortalUserSerializer, ProfileStatusSerializer
 
 
-class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+class PortalUserViewSet(viewsets.ModelViewSet):
+    queryset = PortalUser.objects.all()
+    serializer_class = PortalUserSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = "__all__"
@@ -22,6 +22,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 
 class ProfileStatusViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
+    queryset = ProfileStatus.objects.all()
     serializer_class = ProfileStatusSerializer
     permission_classes = [permissions.IsAuthenticated]

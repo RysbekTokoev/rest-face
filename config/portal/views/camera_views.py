@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
-from portal.models import Camera
+from portal.models import Camera, PortalUser
 from portal.serializers.camera_serializers import CameraSerializer
 
 
@@ -17,9 +17,11 @@ class CameraViewSet(viewsets.ModelViewSet):
         return queryset.filter(portal=user.portal)
 
     def update(self, request, *args, **kwargs):
+        print(request.user.id)
         user = request.user
+        user = PortalUser.objects.get(user__id=user.id)
         instance = self.get_object()
-        if instance.user != user:
+        if instance.portal != user.portal:
             return Response(status=status.HTTP_403_FORBIDDEN)
         return super(CameraViewSet, self).update(request, *args, **kwargs)
 
