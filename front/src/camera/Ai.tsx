@@ -1,9 +1,7 @@
 import * as React from "react";
-import { ChangeEventHandler, MutableRefObject, RefObject, useEffect, useRef, useState } from 'react';
+import {useEffect, useRef, useState} from "react";
 import * as faceapi from 'face-api.js';
 import axios from 'axios';
-
-import Webcam from 'react-webcam';
 
 import './Ai.scss';
 
@@ -25,9 +23,10 @@ function getCookie(name: string) {
 // create props
 interface AiProps {
     recognitionCallback: (name: string) => void;
+    cameraId: string | undefined;
 }
 
-function Ai({ recognitionCallback }: AiProps) {
+function Ai({ recognitionCallback, cameraId }: AiProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const cameraCanvas = useRef<HTMLCanvasElement>(null);
 
@@ -43,6 +42,7 @@ function Ai({ recognitionCallback }: AiProps) {
         let body={
             encoding: detected,
             portal: 'test',
+            camera: ''
         }
 
         return axios.post(Url, body, {

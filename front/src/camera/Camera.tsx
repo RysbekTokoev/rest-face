@@ -5,6 +5,9 @@ import * as faceapi from 'face-api.js';
 import Ai from './Ai';
 import './App.scss';
 import PageTemplate from "../common/PageTemplate";
+import {useParams} from "react-router-dom";
+import { ICamera } from "./CameraList";
+import axios from "axios";
 
 
 
@@ -20,6 +23,8 @@ const Recognitions = () => {
 const Camera = () => {
 
 	let [ready, setReady] = useState<boolean>(false);
+    let { id } = useParams();
+	let [camera, setCamera] = useState<ICamera | undefined>(undefined);
 
 	const loadModels = () => {
 		const MODEL_URL = `${process.env.PUBLIC_URL}/models`;
@@ -39,6 +44,10 @@ const Camera = () => {
 		loadModels();
 		setReady(true);
 		console.log('models loaded')
+
+		axios.get(`http://127.0.0.1:8000/api/portal/camera/${id}`).then(response => {
+			setCamera(response.data);
+		})
 	}, [])
 
 	let emotions = [
@@ -82,19 +91,21 @@ const Camera = () => {
 
 	return (
 		<PageTemplate>
-			<div className="app">
-				<div className="camera-container">
-					<div className='camera-section'>
-						<div className='emotion'></div>
-						{
-							ready ? <Ai recognitionCallback={addRecognition}/> : 'loading...'
-						}
-					</div>
-					<div className='recognition-section'>
-						<Recognitions />
+			{!camera ? <h1>Camera not found</h1> :
+				<div className="app">
+					<div className="camera-container">
+						<div className='camera-section'>
+							<div className='emotion'></div>
+							{
+								ready ? <Ai recognitionCallback={addRecognition} cameraId={id}/> : 'loading...'
+							}
+						</div>
+						<div className='recognition-section'>
+							<Recognitions />
+						</div>
 					</div>
 				</div>
-			</div>
+			}
 		</PageTemplate>
 	);
 }; export default Camera;

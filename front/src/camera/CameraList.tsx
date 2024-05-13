@@ -10,7 +10,7 @@ import TableBody from "@mui/material/TableBody";
 import axios from "axios";
 
 
-interface ICamera {
+export interface ICamera {
     id: number;
     name: string;
     status: string;
@@ -39,8 +39,8 @@ const CameraList = () => {
               },
             }).then(response => {
                 console.log(response.data);
-              // setCameras(response.data.results);
-              // setLoading(false);
+              setCameras(response.data.results);
+              setLoading(false);
             });
     }, []);
 
