@@ -27,8 +27,8 @@ export default function RecognitionsTable() {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Время</TableCell>
             <TableCell>Имя</TableCell>
+            <TableCell>Эмоция</TableCell>
             <TableCell>Камера</TableCell>
             <TableCell align={"right"}>Дата</TableCell>
           </TableRow>

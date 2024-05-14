@@ -15,7 +15,7 @@ import {
   DialogContent,
   DialogTitle,
   Paper,
-  Card, CardMedia, CardContent
+  Card, CardMedia, CardContent, InputLabel, Tooltip
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -24,6 +24,7 @@ import axios from "axios";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 interface Face {
   id: number;
@@ -76,6 +77,7 @@ const Faces = () => {
     const formData = new FormData();
     formData.append('username', username);
     formData.append('note', note);
+    formData.append('to_notify', notify.toString());
     if (image) {
       formData.append('image', image);
     }
@@ -93,7 +95,7 @@ const Faces = () => {
     axios.get("http://127.0.0.1:8000/api/main/faces/").then(response => {
       setFaces(response.data.results);
     });
-  }, [handleSave]);
+  }, [open]);
 
   const handleToggle = () => {
     setNotify(!notify);
@@ -165,7 +167,7 @@ const Faces = () => {
             </Table>
           </Paper>
           <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-            <DialogTitle>Add/Edit Face</DialogTitle>
+            <DialogTitle>{editMode? "Edit": "Add"}</DialogTitle>
             <CardMedia
               component="img"
               height="360"
@@ -179,6 +181,20 @@ const Faces = () => {
             <DialogContent>
               <TextField autoFocus margin="dense" id="username" label="Username" type="text" fullWidth variant="standard" value={username} onChange={(e) => setUsername(e.target.value)} />
               <TextField margin="dense" id="note" label="Note" type="text" fullWidth variant="standard" value={note} onChange={(e) => setNote(e.target.value)} />
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box display="flex" alignItems="center">
+                  <InputLabel>Уведомлять о человеке</InputLabel>
+                  <Tooltip title="Уведомления приходят на портал и на почту, указанную в настройках">
+                    <IconButton>
+                      <HelpOutlineIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+                <FormControlLabel
+                  control={<Switch checked={notify} onChange={handleToggle} />}
+                  label=""
+                />
+              </Box>
               <Box display="flex" justifyContent="center" marginTop={2}>
                 <Button variant="contained" component="label">
                   Upload Image
@@ -193,14 +209,14 @@ const Faces = () => {
           </Dialog>
         </Box>
       </Grid>
-      <Grid item xs={4}> {/* 40% detail view container */}
+      <Grid item xs={4}>
         <Box maxWidth="md" margin="auto" id="detail" marginTop="40px">
           {selectedFace && (
             <Card>
               <CardMedia
                 component="img"
                 height="300"
-                image={selectedFace.image} // replace with the actual image path
+                image={selectedFace.image}
                 alt={selectedFace.username}
               />
               <CardContent>
@@ -208,7 +224,6 @@ const Faces = () => {
                   {selectedFace.username}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {/* Add other face details here */}
                 </Typography>
               </CardContent>
             </Card>
