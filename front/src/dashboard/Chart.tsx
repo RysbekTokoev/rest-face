@@ -3,29 +3,21 @@ import { useTheme } from '@mui/material/styles';
 import { LineChart, axisClasses } from '@mui/x-charts';
 import { ChartsTextStyle } from '@mui/x-charts/ChartsText';
 import Title from './Title';
+import axios from "axios";
 
-// Generate Sales Data
-function createData(
-  time: string,
-  amount?: number,
-): { time: string; amount: number | null } {
-  return { time, amount: amount ?? null };
-}
 
-const data = [
-  createData('00:00', 0),
-  createData('03:00', 300),
-  createData('06:00', 600),
-  createData('09:00', 800),
-  createData('12:00', 1500),
-  createData('15:00', 2000),
-  createData('18:00', 2400),
-  createData('21:00', 2400),
-  createData('24:00'),
-];
 
 export default function Chart() {
   const theme = useTheme();
+  const [data, setData] = React.useState<any>([]);
+  const [max, setMax] = React.useState<number>(10);
+
+  React.useEffect(() => {
+    axios.get("http://127.0.0.1:8000/api/main/recognitions/chart/").then(response => {
+        setData(response.data);
+        setMax(response.data.reduce((acc: number, item: any) => Math.max(acc, item.count), 10) + 30);
+    });
+  }, []);
 
   return (
     <React.Fragment>
@@ -55,13 +47,13 @@ export default function Chart() {
                 fill: theme.palette.text.primary,
               },
               tickLabelStyle: theme.typography.body2 as ChartsTextStyle,
-              max: 2500,
+              max: max,
               tickNumber: 3,
             },
           ]}
           series={[
             {
-              dataKey: 'amount',
+              dataKey: 'count',
               showMark: false,
               color: theme.palette.primary.light,
             },
