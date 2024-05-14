@@ -9,6 +9,9 @@ class Emotion(models.Model):
     id = models.AutoField(primary_key=True)
     emotion = models.CharField(max_length=25)
 
+    def __str__(self):
+        return self.emotion
+
 
 def _user_directory_path(instance, filename):
     return f'{instance.portal.sub_url}/known/{instance.username}/{filename}'
@@ -25,6 +28,9 @@ class Face(models.Model):
     def get_absolute_url(self):
         return f"http://127.0.0.1:8000/api/main/faces/{self.id}/"
 
+    def __str__(self):
+        return self.username
+
 
 class Recognition(models.Model):
     id = models.AutoField(primary_key=True)
@@ -35,6 +41,9 @@ class Recognition(models.Model):
 
     def get_absolute_url(self):
         return f"http://127.0.0.1:8000/api/main/recognition/{self.id}/"
+
+    def __str__(self):
+        return self.camera.name + ": " + (self.face.username if self.face else "unknown")
 
 
 @receiver(models.signals.post_delete, sender=Face, weak=False)
