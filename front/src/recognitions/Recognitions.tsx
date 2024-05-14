@@ -20,7 +20,7 @@ interface Page {
   previous: string | null;
 }
 
-function formatDate(dateString: string) {
+export function formatDate(dateString: string) {
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
   const date = new Date(dateString);
   return date.toLocaleDateString("RU", options);
@@ -54,7 +54,7 @@ const Recognitions = () => {
           <Paper elevation={3}>
             <Box p={3}>
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Title>Недавние распознования</Title>
+                <Title>Распознования</Title>
                 <TablePagination
                   component="div"
                   count={page.count}
