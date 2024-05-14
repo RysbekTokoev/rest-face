@@ -20,4 +20,5 @@ class RecognitionViewSet(viewsets.ModelViewSet):
         portal = user.portaluser.portal
 
         queryset = queryset.filter(face__portal=portal)
+        queryset = queryset.order_by('-created_at')
         return super().filter_queryset(queryset)
