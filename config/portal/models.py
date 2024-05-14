@@ -8,6 +8,8 @@ class Settings(models.Model):
     id = models.AutoField(primary_key=True)
     detect_emotions = models.BooleanField(default=True)
     detect_unkown = models.BooleanField(default=True)
+    enable_api = models.BooleanField(default=True)
+    time_to_store = models.IntegerField(default=30)
     portal = models.OneToOneField("Portal", on_delete=models.CASCADE)
 
     def __str__(self):
