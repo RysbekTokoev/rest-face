@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.utils import timezone
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -12,6 +13,35 @@ from portal.models import Camera
 
 def tester(request):
     return render(request, 'index.html')
+
+
+def get_response(face, settings, camera, emotion):
+    if settings.detect_unknown or face:
+        recognition = Recognition.objects.create(
+            face=face if face else None,
+            emotion=emotion,
+            camera=camera
+        )
+        if face:
+            response = {
+                'face': recognition.face.id,
+                'name': recognition.face.username,
+                'time': recognition.created_at,
+            }
+            response.update({'emotion': recognition.emotion.emotion}) if recognition.emotion else None
+        else:
+            response = {
+                'face': None,
+                'name': 'unknown',
+                'time': recognition.created_at,
+            }
+    else:
+        response = {
+            'face': None,
+            'name': 'unknown',
+            'time': timezone.now(),
+        }
+    return response
 
 
 class FaceViewSet(viewsets.ModelViewSet):
@@ -36,27 +66,10 @@ class FaceViewSet(viewsets.ModelViewSet):
         if request.data.get('emotion', None):
             emotion = Emotion.objects.get_or_create(emotion=request.data['emotion'])[0]
 
+        settings = user.portaluser.portal.settings
         camera = Camera.objects.get(id=request.data.get('camera', None))
-        recognition = Recognition.objects.create(
-            face=face if face else None,
-            emotion=emotion,
-            camera=camera
-        )
 
-        if face:
-            response = {
-                'face': recognition.face.id,
-                'name': recognition.face.username,
-                'time': recognition.created_at,
-                }
-            response.update({'emotion': recognition.emotion.emotion}) if recognition.emotion else None
-        else:
-            response = {
-                'face': None,
-                'name': 'unknown',
-                'time': recognition.created_at,
-            }
-
+        response = get_response(face, settings, camera, emotion)
         return Response(response)
 
     def create(self, request, *args, **kwargs):

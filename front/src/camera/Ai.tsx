@@ -2,30 +2,19 @@ import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import * as faceapi from 'face-api.js';
 import axios from 'axios';
-
 import './Ai.scss';
 
-function getCookie(name: string) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
 
-// create props
 interface AiProps {
     recognitionCallback: (name: string) => void;
     cameraId: string | undefined;
 }
 
+interface Settings {
+    id: number;
+    detect_emotions: boolean;
+    detect_unknown: boolean;
+}
 function Ai({ recognitionCallback, cameraId }: AiProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const cameraCanvas = useRef<HTMLCanvasElement>(null);
@@ -33,21 +22,20 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
     const [results, setResults] = useState<Array<any> | undefined>(undefined);
     const [loading, setLoading] = useState(false);
     const Url: string = 'http://127.0.0.1:8000/api/main/faces/recognize/';
-    const csrftoken: string | null = getCookie('csrftoken');
     const lastRecognized = useRef<Float32Array>(new Float32Array(0));
     const lastRecognitionTime = useRef<number>(Date.now());
+    const [settings, setSettings] = useState<Settings>({ id: 0, detect_emotions: true, detect_unknown: true });
 
 
     function sendFace(detected: Float32Array, emotion: string){
         let body={
             encoding: detected,
-            emotion: emotion,
+            emotion: settings.detect_emotions ? emotion : 'disabled',
             camera: cameraId
         }
 
         return axios.post(Url, body, {
             headers: {
-                'X-CSRFToken': csrftoken,
                 'Content-Type': 'application/json'
             }
         })
@@ -89,7 +77,8 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
             .withFaceDescriptors();
 
         return faceapi.resizeResults(faces, displaySize);
-    };
+    }
+
     async function drawResults(image: HTMLVideoElement, canvas: HTMLCanvasElement, results: Array<any>): Promise<void> {
         if (image && canvas && results) {
             const imgSize: DOMRect = image.getBoundingClientRect();
@@ -99,7 +88,8 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
             canvas.getContext('2d')!.clearRect(0, 0, canvas.width, canvas.height);
             const resizedDetections = faceapi.resizeResults(results, displaySize);
             faceapi.draw.drawDetections(canvas, resizedDetections);
-            faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
+            if (settings.detect_emotions)
+                faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
             faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
 
             resizedDetections.forEach((face: any) => {
@@ -118,7 +108,7 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
         else {
             console.log('no image, canvas, or results')
         }
-    };
+    }
 
     async function getFaces(): Promise<void> {
         if (videoRef.current !== null && videoRef.current !== undefined) {
@@ -218,8 +208,8 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
         const img: HTMLImageElement = await faceapi.bufferToImage(selectedFiles?.[0]);
         let faces = await faceapi.detectAllFaces(img, new faceapi.TinyFaceDetectorOptions({ inputSize: 320 }))
             .withFaceLandmarks()
-            .withFaceExpressions()
             .withAgeAndGender()
+            .withFaceExpressions();
 
         if (faces.length === 0) {
             console.log('no faces')
@@ -232,7 +222,8 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
         faces = faceapi.resizeResults(faces, img)
         faceapi.draw.drawDetections(canvas, faces)
         faceapi.draw.drawFaceLandmarks(canvas, faces)
-        faceapi.draw.drawFaceExpressions(canvas, faces)
+        if (settings.detect_emotions)
+            faceapi.draw.drawFaceExpressions(canvas, faces)
 
         //draw gender and age
         faces.forEach((face: any) => {
@@ -248,10 +239,6 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
         })
 
         setImgLoading(false);
-
-
-
-
     }
 
     const intervalRef = useRef<any>(null)
@@ -276,9 +263,14 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
 
     }, [captureVideo]);
 
+    useEffect(() => {
+        axios.get<Settings>('http://127.0.0.1:8000/api/portal/settings/my_settings').then(response => {
+            setSettings(response.data);
+        });
+    }, []);
+
     return (
         <div className="ai">
-
             <div className='viewer'>
                 {
                     captureVideo ?

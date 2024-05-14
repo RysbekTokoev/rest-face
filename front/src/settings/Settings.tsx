@@ -36,6 +36,9 @@ function Settings() {
     axios.get<ISettings>('http://127.0.0.1:8000/api/portal/settings/my_settings').then(response => {
         setSettings(response.data);
         setDefaultSettings(response.data);
+
+        emailInputRef.current!.value = response.data.email ? response.data.email : ''
+        subUrlInputRef.current!.value = response.data.sub_url ? response.data.sub_url : '';
     });
   }, []);
 
@@ -51,7 +54,7 @@ function Settings() {
   };
 
   const handleSave = () => {
-    axios.patch('http://127.0.0.1:8000/api/portal/settings/my_settings', settings).then(response => {
+    axios.patch(`http://127.0.0.1:8000/api/portal/settings/${settings.id}/`, settings).then(response => {
       console.log(response);
     });
   };
