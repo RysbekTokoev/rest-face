@@ -43,10 +43,12 @@ export default function PageTemplate({children}: {children: React.ReactNode}) {
             <Context.Provider value={open}>
                 <AppBar toggleDrawer={toggleDrawer}/>
                 <Drawer toggleDrawer={toggleDrawer}/>
-            </Context.Provider>)
+            </Context.Provider>
         <Box
           component="main"
           sx={{
+            display: 'flex',
+            flexDirection: 'column',
             backgroundColor: (theme) =>
               theme.palette.mode === 'light'
                 ? theme.palette.grey[100]
@@ -57,8 +59,10 @@ export default function PageTemplate({children}: {children: React.ReactNode}) {
           }}
         >
             <Toolbar />
-            {children}
-            <Copyright sx={{ pt: 4 }} />
+            <Box sx={{ flexGrow: 1 }}>
+              {children}
+            </Box>
+            <Copyright sx={{ pt: 4 }} marginBottom={3} />
           </Box>
         </Box>
       </ThemeProvider>
