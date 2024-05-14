@@ -11,6 +11,7 @@ class Settings(models.Model):
     enable_api = models.BooleanField(default=True)
     time_to_store = models.IntegerField(default=30)
     portal = models.OneToOneField("Portal", on_delete=models.CASCADE)
+    email = models.EmailField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return "Setting: " + self.portal.name
