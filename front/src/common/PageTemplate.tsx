@@ -13,7 +13,6 @@ import Toolbar from "@mui/material/Toolbar";
 const Context = createContext<boolean>(true);
 export const useGetOpen = () => useContext(Context);
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 function Copyright(props: any) {

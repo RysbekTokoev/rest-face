@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL = "http://localhost:8000/auth/jwt/";
 
-export const login = (username: string, password: string) => {
+export const login = (username: File | string | null, password: File | string | null) => {
   return axios
     .post(API_URL + "create", {
       username,

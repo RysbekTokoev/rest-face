@@ -1,37 +1,28 @@
-import React, { useState } from "react";
-import { NavigateFunction, useNavigate } from 'react-router-dom';
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import * as React from 'react';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import {NavigateFunction, useNavigate} from 'react-router-dom';
+import Box from '@mui/material/Box';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import {createTheme, ThemeProvider} from '@mui/material/styles';
+import {login} from "../services/auth.service";
 
-import { login } from "../services/auth.service";
 
-type Props = {}
+const defaultTheme = createTheme();
 
-const Login: React.FC<Props> = () => {
+export default function SignIn() {
   let navigate: NavigateFunction = useNavigate();
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>("");
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
 
-  const initialValues: {
-    username: string;
-    password: string;
-  } = {
-    username: "",
-    password: "",
-  };
-
-  const validationSchema = Yup.object().shape({
-    username: Yup.string().required("This field is required!"),
-    password: Yup.string().required("This field is required!"),
-  });
-
-  const handleLogin = (formValue: { username: string; password: string }) => {
-    const { username, password } = formValue;
-
-    setMessage("");
-    setLoading(true);
-
+    const username = data.get("username");
+    const password = data.get("password");
     login(username, password).then(
       () => {
         navigate("/");
@@ -44,68 +35,72 @@ const Login: React.FC<Props> = () => {
             error.response.data.message) ||
           error.message ||
           error.toString();
-
-        setLoading(false);
-        setMessage(resMessage);
       }
     );
   };
 
   return (
-    <div className="col-md-12">
-      <div className="card card-container">
-        <img
-          src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-          alt="profile-img"
-          className="profile-img-card"
-        />
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={handleLogin}
+    <ThemeProvider theme={defaultTheme}>
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Box
+          sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
         >
-          <Form>
-            <div className="form-group">
-              <label htmlFor="username">Username</label>
-              <Field name="username" type="text" className="form-control" />
-              <ErrorMessage
-                name="username"
-                component="div"
-                className="alert alert-danger"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <Field name="password" type="password" className="form-control" />
-              <ErrorMessage
-                name="password"
-                component="div"
-                className="alert alert-danger"
-              />
-            </div>
-
-            <div className="form-group">
-              <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                {loading && (
-                  <span className="spinner-border spinner-border-sm"></span>
-                )}
-                <span>Login</span>
-              </button>
-            </div>
-
-            {message && (
-              <div className="form-group">
-                <div className="alert alert-danger" role="alert">
-                  {message}
-                </div>
-              </div>
-            )}
-          </Form>
-        </Formik>
-      </div>
-    </div>
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign in
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
+              autoFocus
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Sign In
+            </Button>
+            {/*<Grid container>*/}
+            {/*  <Grid item xs>*/}
+            {/*    <Link href="#" variant="body2">*/}
+            {/*      Forgot password?*/}
+            {/*    </Link>*/}
+            {/*  </Grid>*/}
+            {/*  <Grid item>*/}
+            {/*    <Link href="#" variant="body2">*/}
+            {/*      {"Don't have an account? Sign Up"}*/}
+            {/*    </Link>*/}
+            {/*  </Grid>*/}
+            {/*</Grid>*/}
+          </Box>
+        </Box>
+      </Container>
+    </ThemeProvider>
   );
-};
-
-export default Login;
+}
