@@ -39,8 +39,13 @@ export default function Trends() {
       <Title>Emotion Trends</Title>
       <BarChart
         series={data}
-        width={600}
-        height={350}
+        width={500}
+        height={200}
+        slotProps={{
+            legend: {
+              hidden: true
+            },
+      }}
       />
     </React.Fragment>
   );

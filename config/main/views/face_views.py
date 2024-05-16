@@ -35,8 +35,7 @@ def get_response(face, settings, camera, emotion):
             if face.to_notify:
                 notification = Notification.objects.create(
                     face=face,
-                    camera=camera,
-                    message=message.format(face.username, camera.name, recognition.created_at)
+                    message=message.format(face=face.username, camera=camera.name, time=recognition.created_at)
                 )
         else:
             response = {

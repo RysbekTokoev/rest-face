@@ -84,16 +84,20 @@ class RecognitionViewSet(viewsets.ModelViewSet):
 
         recognitions = (
             queryset
-            .values('emotion__emotion')  # Change this line
-            .annotate(count=Count('id'))
+            .values('emotion__emotion')
         )
+        counter = {}
+        for recognition in recognitions:
+            if recognition['emotion__emotion'] in counter:
+                counter[recognition['emotion__emotion']] += 1
+            else:
+                counter[recognition['emotion__emotion']] = 1
 
         recognitions = [
             {
-                "emotion": recognition['emotion__emotion'],  # And this line
-                "count": recognition['count']
+                "emotion": emotion,
+                "count": count
             }
-            for recognition in recognitions
+            for emotion, count in counter.items()
         ]
-
         return Response(recognitions)

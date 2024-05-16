@@ -32,6 +32,8 @@ interface Face {
   username: string;
   // lastRecognized: string;
   image: string;
+  to_notify: boolean;
+  note: string;
 }
 
 const Faces = () => {
@@ -70,6 +72,8 @@ const Faces = () => {
     if (face) {
       setUsername(face.username);
       setPreviewImage(face.image);
+      setNotify(face.to_notify);
+      setNote(face.note)
       // set other form fields...
 
       // Fetch image from URL and create a File object
@@ -99,7 +103,7 @@ const Faces = () => {
     if (!image) return;
     const img: HTMLImageElement = await faceapi.bufferToImage(image);
     const face = await faceapi
-            .detectAllFaces(img, new faceapi.SsdMobilenetv1Options())
+            .detectAllFaces(img, new faceapi.SsdMobilenetv1Options({ maxResults: 1}))
             .withFaceLandmarks()
             .withFaceDescriptors();
     axios.patch(`http://127.0.0.1:8000/api/main/faces/${selectedFace?.id}/`, {"encoding": face[0].descriptor})

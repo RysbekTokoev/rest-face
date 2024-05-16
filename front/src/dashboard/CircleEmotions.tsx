@@ -34,13 +34,22 @@ export default function CircleEmotions( {date}: {date: Date}) {
                 responsive: true,
                 plugins: {
                   legend: {
-                    position: 'top',
-                  },
+                      direction: 'column',
+                      position: { vertical: 'middle', horizontal: 'left' },
+                      padding: -5,
+                    },
                   title: {
                     display: true,
                     text: 'Emotion Chart'
                   }
                 }
+              }}
+              slotProps={{
+                legend: {
+                  direction: 'column',
+                  position: { vertical: 'middle', horizontal: 'left' },
+                  padding: -5,
+                },
               }}
               height={200}
             />
