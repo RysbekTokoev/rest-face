@@ -9,6 +9,7 @@ import PageTemplate from "../common/PageTemplate";
 import CircleEmotions from "./CircleEmotions";
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import Trends from "./Trends";
 
 function Dashboard() {
   const [date, setDate] = React.useState(new Date());
@@ -86,6 +87,11 @@ function Dashboard() {
           <Grid item xs={6}>
             <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
               <CircleEmotions date={date}/>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+              <Trends />
             </Paper>
           </Grid>
           {/* Recent Orders */}

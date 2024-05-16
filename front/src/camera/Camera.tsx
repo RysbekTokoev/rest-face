@@ -32,6 +32,8 @@ const Camera = () => {
 
 		let p: Promise<Array<any>> = Promise.all([
 			faceapi.nets.tinyFaceDetector.loadFromUri(`${MODEL_URL}/tiny_face_detector_model-weights_manifest.json`),
+			// faceapi.nets.ssdMobilenetv1.loadFromUri(`${MODEL_URL}/ssd_mobilenetv1_model-weights_manifest.json`),
+			// faceapi.nets.tinyYolov2.loadFromUri(`${MODEL_URL}/tiny_yolov2_model-weights_manifest.json`),
 			faceapi.nets.faceLandmark68Net.loadFromUri(`${MODEL_URL}/face_landmark_68_model-weights_manifest.json`),
 			faceapi.nets.faceRecognitionNet.loadFromUri(`${MODEL_URL}/face_recognition_model-weights_manifest.json`),
 			faceapi.nets.faceExpressionNet.loadFromUri(`${MODEL_URL}/face_expression_model-weights_manifest.json`),

@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from main.models import Face, Recognition, Emotion
+from main.models import Face, Recognition, Emotion, Notification
 from main.serializers import FaceSerializer
 from main.utils.image_utils import recognize_face
 from portal.models import Camera
@@ -13,6 +13,8 @@ from portal.models import Camera
 
 def tester(request):
     return render(request, 'index.html')
+
+message = "Внимание, камера {camera} заметила {face} в {time}"
 
 
 def get_response(face, settings, camera, emotion):
@@ -29,6 +31,13 @@ def get_response(face, settings, camera, emotion):
                 'time': recognition.created_at,
             }
             response.update({'emotion': recognition.emotion.emotion}) if recognition.emotion else None
+
+            if face.to_notify:
+                notification = Notification.objects.create(
+                    face=face,
+                    camera=camera,
+                    message=message.format(face.username, camera.name, recognition.created_at)
+                )
         else:
             response = {
                 'face': None,
@@ -59,6 +68,8 @@ class FaceViewSet(viewsets.ModelViewSet):
             face = recognize_face(stream=request.FILES.get('file'))
         elif request.data.get('encoding'):
             face = recognize_face(encoding=request.data['encoding'])
+        elif request.data.get('id'):
+            face = Face.objects.get(id=request.data['id'])
         else:
             return Response("No data provided")
 
@@ -77,4 +88,6 @@ class FaceViewSet(viewsets.ModelViewSet):
         portal = user.portaluser.portal
         request.data._mutable = True
         request.data['portal'] = portal.id
+        if request.data.get('image', None):
+            image = request.data.pop('image')
         return super().create(request, *args, **kwargs)

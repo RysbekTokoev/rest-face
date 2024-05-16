@@ -25,13 +25,21 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
     const lastRecognized = useRef<Float32Array>(new Float32Array(0));
     const lastRecognitionTime = useRef<number>(Date.now());
     const [settings, setSettings] = useState<Settings>({ id: 0, detect_emotions: true, detect_unknown: true });
+    const [faceEncodings, setFaceEncodings] = useState<Array<{ label: string, descriptor: Float32Array }>>([]);
 
 
     function sendFace(detected: Float32Array, emotion: string){
-        let body={
-            encoding: detected,
+        let body: {[k: string]: any} = {
             emotion: settings.detect_emotions ? emotion : 'disabled',
             camera: cameraId
+        }
+
+        const faceMatcher = new faceapi.FaceMatcher(faceEncodings);
+        const bestMatch = faceMatcher.findBestMatch(detected);
+        if (bestMatch.label !== 'unknown') {
+            body['id'] = bestMatch.label;
+        } else {
+            body['encoding'] =  detected;
         }
 
         return axios.post(Url, body, {
@@ -40,14 +48,10 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
             }
         })
           .then(function (response) {
-            // if response status is 200 then add name to the #recognized ul list
-            // if response status is 200 then add name to the #recognized ul list
             if (response.status === 200) {
                 const recognizedName = response.data.name;
-                // Only call recognitionCallback if the recognized name is new and it's been at least one second since the last recognition
-                lastRecognitionTime.current = Date.now();
-                lastRecognized.current = detected;
-                recognitionCallback(recognizedName);
+                if (settings.detect_unknown || recognizedName != 'unknown')
+                    recognitionCallback(recognizedName);
             }
           })
           .catch(function (error) {
@@ -70,7 +74,7 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
         }
 
         const faces = await faceapi
-            .detectAllFaces(image, new faceapi.TinyFaceDetectorOptions({ inputSize: 320 }))
+            .detectAllFaces(image, new faceapi.TinyFaceDetectorOptions({ inputSize: 320}))
             .withFaceLandmarks()
             .withFaceExpressions()
             .withAgeAndGender()
@@ -110,6 +114,22 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
         }
     }
 
+    React.useEffect(() => {
+        axios.get('http://127.0.0.1:8000/api/main/faces/').then(response => {
+          const faces = response.data.results;
+          const encodings = faces.map((face: any) => {
+                const encodingFloat32Array = Float32Array.from(face.encoding_obj);
+                const desc = new faceapi.LabeledFaceDescriptors(
+                    face.id.toString(),
+                    [encodingFloat32Array]
+                  )
+                return desc
+            });
+          console.log(encodings);
+          setFaceEncodings(encodings);
+        });
+    }, []);
+
     async function getFaces(): Promise<void> {
         if (videoRef.current !== null && videoRef.current !== undefined) {
             const faces: Array<any> = await detectFaces(videoRef.current/* .video */);
@@ -118,20 +138,18 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
 
             if (faces.length > 0) {
                 // TODO здесь могут быть настройки времени
-                // console.log(lastRecognized.current.length, Date.now() - lastRecognitionTime.current)
                 if (lastRecognized.current.length > 0 && Date.now() - lastRecognitionTime.current < 60*1000) {
                     let faceMatcher = new faceapi.FaceMatcher(faces[0].descriptor);
                     let match = faceMatcher.findBestMatch(lastRecognized.current)
 
-                    if (match.distance < 0.7) {
-                        console.log('old face')
-                        lastRecognized.current = faces[0].descriptor;
-                    } else {
+                    if (match.distance >= 0.6) {
                         sendFace(faces[0].descriptor, faces[0].expressions.asSortedArray()[0].expression);
                     }
                 } else {
                     sendFace(faces[0].descriptor, faces[0].expressions.asSortedArray()[0].expression);
                 }
+                lastRecognized.current = faces[0].descriptor;
+                lastRecognitionTime.current = Date.now();
             }
         }
         if (loading) {
@@ -153,7 +171,6 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
         setFileOk(false);
         navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
             videoRef!.current!.srcObject = stream;
-            console.log('video starting')
             setIsCameraOn(true);
         }).catch((err) => {
             console.log(err)
@@ -212,7 +229,6 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
             .withFaceExpressions();
 
         if (faces.length === 0) {
-            console.log('no faces')
             return;
         } else {
         }
@@ -244,18 +260,15 @@ function Ai({ recognitionCallback, cameraId }: AiProps) {
     const intervalRef = useRef<any>(null)
     useEffect(() => {
         if (captureVideo) {
-            console.log('video enabled')
 
             if (videoRef !== null && videoRef !== undefined) {
                 intervalRef.current = setInterval(async () => {
                     await getFaces();
-                    console.log(captureVideo);
                 }, 100);
                 console.log(intervalRef.current)
             }
         } else {
             console.log('pong')
-            console.log(captureVideo)
             console.log(intervalRef.current)
             clearInterval(intervalRef.current);
             intervalRef.current = null;

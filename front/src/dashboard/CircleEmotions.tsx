@@ -22,7 +22,7 @@ export default function CircleEmotions( {date}: {date: Date}) {
 
   return (
     <React.Fragment>
-      <Title>Emotion Chart</Title>
+      <Title>Эмоции</Title>
       <div style={{ width: '100%', flexGrow: 1, overflow: 'hidden' }}>
         {loading ? (
           <div>Loading...</div>

@@ -14,7 +14,7 @@ axios.interceptors.response.use(resp => resp, async error => {
            });
     if (response.status === 200) {
        axios.defaults.headers.common['Authorization'] = `${response.data['access']}`;
-       localStorage.setItem('access_token', response.data.access);
+       localStorage.setItem('access_token', response.data['access']);
        return axios(error.config);
     }
   }
@@ -28,8 +28,9 @@ axios.interceptors.request.use(function (config) {
 
     // if url does not contain word refresh
     if (config.url && config.url.indexOf('refresh') === -1) {
-        if (token)
-            config.headers.Authorization =  `JWT ${token}`;
+        if (token) {
+            config.headers.Authorization = `JWT ${token}`;
+        }
     }
 
     return config;

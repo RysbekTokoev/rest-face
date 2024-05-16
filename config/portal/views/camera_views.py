@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 
 from portal.models import Camera, PortalUser
@@ -8,6 +8,7 @@ from portal.serializers.camera_serializers import CameraSerializer
 class CameraViewSet(viewsets.ModelViewSet):
     queryset = Camera.objects.all()
     serializer_class = CameraSerializer
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         queryset = Camera.objects.all()

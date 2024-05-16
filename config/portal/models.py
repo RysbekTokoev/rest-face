@@ -75,9 +75,9 @@ def save_user_profile(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Portal)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_portal_settings(sender, instance, created, **kwargs):
     if created:
         Settings.objects.create(portal=instance)
 @receiver(post_save, sender=Portal)
-def save_user_profile(sender, instance, **kwargs):
+def save_portal_settings(sender, instance, **kwargs):
     instance.settings.save()

@@ -25,6 +25,7 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import * as faceapi from "face-api.js";
 
 interface Face {
   id: number;
@@ -40,9 +41,30 @@ const Faces = () => {
   const [notify, setNotify] = React.useState(false);
   const [selectedFace, setSelectedFace] = React.useState<Face | null>(null);
   const [image, setImage] = React.useState<File | null>(null);
+  const [encoding, setEncoding] = React.useState<string | Blob>("");
   const [previewImage, setPreviewImage] = React.useState<string | null>("/person.jpg");
   const [note, setNote] = React.useState("");
   const [editMode, setEditMode] = React.useState(false);
+
+  React.useEffect(() => {
+    loadModels();
+  }, []);
+
+  const loadModels = () => {
+		const MODEL_URL = `${process.env.PUBLIC_URL}/models`;
+		console.log(process.env.PUBLIC_URL);
+
+		let p: Promise<Array<any>> = Promise.all([
+			// faceapi.nets.tinyFaceDetector.loadFromUri(`${MODEL_URL}/tiny_face_detector_model-weights_manifest.json`),
+            faceapi.nets.ssdMobilenetv1.loadFromUri(`${MODEL_URL}/ssd_mobilenetv1_model-weights_manifest.json`),
+			faceapi.nets.faceLandmark68Net.loadFromUri(`${MODEL_URL}/face_landmark_68_model-weights_manifest.json`),
+			faceapi.nets.faceRecognitionNet.loadFromUri(`${MODEL_URL}/face_recognition_model-weights_manifest.json`),
+			faceapi.nets.faceExpressionNet.loadFromUri(`${MODEL_URL}/face_expression_model-weights_manifest.json`),
+			faceapi.nets.ageGenderNet.loadFromUri(`${MODEL_URL}/age_gender_model-weights_manifest.json`),
+		]);
+		return p;
+
+	};
 
   const handleClickOpen = async (face: Face | null) => {
     if (face) {
@@ -73,6 +95,16 @@ const Faces = () => {
     setEditMode(false);
   };
 
+  async function getEncoding() {
+    if (!image) return;
+    const img: HTMLImageElement = await faceapi.bufferToImage(image);
+    const face = await faceapi
+            .detectAllFaces(img, new faceapi.SsdMobilenetv1Options())
+            .withFaceLandmarks()
+            .withFaceDescriptors();
+    axios.patch(`http://127.0.0.1:8000/api/main/faces/${selectedFace?.id}/`, {"encoding": face[0].descriptor})
+  }
+
   const handleSave = () => {
     const formData = new FormData();
     formData.append('username', username);
@@ -85,8 +117,11 @@ const Faces = () => {
     if (editMode) {
       axios.patch(`http://127.0.0.1:8000/api/main/faces/${selectedFace?.id}/`, formData)
     } else {
-      axios.post("http://127.0.0.1:8000/api/main/faces/", formData)
+      axios.post("http://127.0.0.1:8000/api/main/faces/", formData).then(response => {
+        setSelectedFace(response.data);
+      });
     }
+    getEncoding();
     handleClose();
   };
 
