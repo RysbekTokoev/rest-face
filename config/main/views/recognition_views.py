@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+import django_filters
 from django.db.models import Count
 from django.db.models.expressions import ExpressionWrapper
 from django.db.models.fields import IntegerField
@@ -16,12 +17,25 @@ from main.models import Recognition
 from main.serializers import RecognitionSerializer
 
 
+from django_filters import DateRangeFilter,DateFilter
+
+
+class RecognitionsFilter(django_filters.FilterSet):
+    start_date = DateFilter(field_name='created_at', lookup_expr=('gt'),)
+    end_date = DateFilter(field_name='created_at', lookup_expr=('lt'))
+    date_range = DateRangeFilter(field_name='created_at')
+
+    class Meta:
+        model = Recognition
+        fields = ['face', 'emotion', 'created_at']
+
+
 class RecognitionViewSet(viewsets.ModelViewSet):
     queryset = Recognition.objects.all()
     serializer_class = RecognitionSerializer
     permission_classes = [permissions.AllowAny]
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filterset_fields = ['face', 'emotion', 'created_at']
+    filterset_class = RecognitionsFilter
     ordering_fields = ['created_at']
 
     def filter_queryset(self, queryset):
@@ -34,32 +48,28 @@ class RecognitionViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def chart(self, request):
-        # only recognitions created today
-        yesterday = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(hours=-6)
-        queryset = Recognition.objects.filter(
-            created_at__gte=yesterday
-        )
-
+        queryset = self.get_queryset()
         queryset = self.filter_queryset(queryset)
 
         recognitions = (
             queryset
             .annotate(
+                date=TruncDate('created_at'),  # Extract the date
                 hour=ExtractHour('created_at'),
                 minute=ExpressionWrapper(
                     Round(ExtractMinute('created_at') / 15) * 15,
                     output_field=IntegerField()
                 )
             )
-            .values('hour', 'minute')
+            .values('date', 'hour', 'minute')  # Include the date in the values
             .annotate(count=Count('id'))
-            .order_by('hour', 'minute')
+            .order_by('date', 'hour', 'minute')  # Order by date as well
         )
 
-        # Format the hour and minute into a string in the format HH:MM
+        # Format the date, hour and minute into strings
         recognitions = [
             {
-                "time": f"{recognition['hour']:02d}:{recognition['minute']:02d}",
+                "time": recognition['date'].isoformat() + " "+ f"{recognition['hour']:02d}:{recognition['minute']:02d}",
                 "count": recognition['count']
             }
             for recognition in recognitions
@@ -67,25 +77,23 @@ class RecognitionViewSet(viewsets.ModelViewSet):
 
         return Response(recognitions)
 
-        # # Convert recognitions to a dictionary for easier lookup
-        # recognitions_dict = {
-        #     f"{recognition['hour']:02d}:{recognition['minute']:02d}": recognition['count']
-        #     for recognition in recognitions
-        # }
-        #
-        # # Generate all 15-minute intervals in a day
-        # intervals = [
-        #     f"{hour:02d}:{minute:02d}"
-        #     for hour in range(24) for minute in range(0, 60, 15)
-        # ]
-        #
-        # # Merge the intervals with the recognitions data
-        # recognitions = [
-        #     {
-        #         "time": interval,
-        #         "count": recognitions_dict.get(interval, 0)
-        #     }
-        #     for interval in intervals
-        # ]
-        #
-        # return Response(recognitions)
+    @action(detail=False, methods=['get'])
+    def circle_emotion(self, request):
+        queryset = self.get_queryset()
+        queryset = self.filter_queryset(queryset)
+
+        recognitions = (
+            queryset
+            .values('emotion__emotion')  # Change this line
+            .annotate(count=Count('id'))
+        )
+
+        recognitions = [
+            {
+                "emotion": recognition['emotion__emotion'],  # And this line
+                "count": recognition['count']
+            }
+            for recognition in recognitions
+        ]
+
+        return Response(recognitions)

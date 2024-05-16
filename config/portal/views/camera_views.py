@@ -30,3 +30,11 @@ class CameraViewSet(viewsets.ModelViewSet):
         if instance.user != user:
             return Response(status=status.HTTP_403_FORBIDDEN)
         return super(CameraViewSet, self).destroy(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        user = PortalUser.objects.get(user__id=user.id)
+        if user.portal is None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        request.data['portal'] = user.portal.id
+        return super(CameraViewSet, self).create(request, *args, **kwargs)

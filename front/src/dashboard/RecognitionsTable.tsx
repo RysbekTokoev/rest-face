@@ -11,15 +11,15 @@ import axios from "axios";
 import {formatDate} from "../recognitions/Recognitions";
 
 
-export default function RecognitionsTable() {
+export default function RecognitionsTable( {date}: {date: Date}) {
   const [rows, setRows] = React.useState<Recognition[]>([]);
 
 
   React.useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/main/recognitions/").then(response => {
+    axios.get("http://127.0.0.1:8000/api/main/recognitions/?start_date=" + date.toISOString().slice(0, 10)).then(response => {
         setRows(response.data.results.slice(0, 10));
     });
-  }, []);
+  }, [date]);
 
   return (
     <React.Fragment>

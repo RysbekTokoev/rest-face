@@ -10,7 +10,7 @@ interface ISettings {
   enable_api: boolean;
   detect_unknown: boolean;
   email: string;
-  sub_url: string;
+  name: string;
   time_to_store: number;
   portal: number;
 }
@@ -22,7 +22,7 @@ const placeholderSettings: ISettings = {
     detect_unknown: false,
     email: '',
     time_to_store: 0,
-    sub_url: '',
+    name: '',
     portal: 0
 }
 
@@ -30,7 +30,7 @@ function Settings() {
   const [defaultSettings, setDefaultSettings] = useState<ISettings>(placeholderSettings);
   const [settings, setSettings] = useState<ISettings>(placeholderSettings)
   const emailInputRef = React.useRef<HTMLInputElement>(null);
-  const subUrlInputRef = React.useRef<HTMLInputElement>(null);
+  const nameInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     axios.get<ISettings>('http://127.0.0.1:8000/api/portal/settings/my_settings').then(response => {
@@ -38,7 +38,7 @@ function Settings() {
         setDefaultSettings(response.data);
 
         emailInputRef.current!.value = response.data.email ? response.data.email : ''
-        subUrlInputRef.current!.value = response.data.sub_url ? response.data.sub_url : '';
+        nameInputRef.current!.value = response.data.name ? response.data.name : '';
     });
   }, []);
 
@@ -48,8 +48,8 @@ function Settings() {
     if (emailInputRef.current) {
       emailInputRef.current.value = defaultSettings.email ? defaultSettings.email : ''
     }
-    if (subUrlInputRef.current) {
-      subUrlInputRef.current.value = defaultSettings.sub_url ? defaultSettings.sub_url : '';
+    if (nameInputRef.current) {
+      nameInputRef.current.value = defaultSettings.name ? defaultSettings.name : '';
     }
   };
 
@@ -73,8 +73,8 @@ function Settings() {
   };
 
   const setSubUrl = () => {
-    if (subUrlInputRef.current) {
-      setSettings({ ...settings, sub_url: subUrlInputRef.current.value });
+    if (nameInputRef.current) {
+      setSettings({ ...settings, name: nameInputRef.current.value });
     }
   };
 
@@ -88,8 +88,8 @@ function Settings() {
               <Box p={3}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Box display="flex" alignItems="center">
-                    <InputLabel>Detect Emotions</InputLabel>
-                    <Tooltip title="Detect emotions in the faces">
+                    <InputLabel>Эмоции</InputLabel>
+                    <Tooltip title="Распознавать эмоции">
                       <IconButton>
                         <HelpOutlineIcon fontSize="small" />
                       </IconButton>
@@ -103,8 +103,8 @@ function Settings() {
 
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Box display="flex" alignItems="center">
-                    <InputLabel>Detect Unknown Faces</InputLabel>
-                    <Tooltip title="Detect unknown faces">
+                    <InputLabel>Неизвестные лица</InputLabel>
+                    <Tooltip title="Распознавать неизвестные лица">
                       <IconButton>
                         <HelpOutlineIcon fontSize="small" />
                       </IconButton>
@@ -118,8 +118,8 @@ function Settings() {
 
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Box display="flex" alignItems="center">
-                    <InputLabel>Enable API</InputLabel>
-                    <Tooltip title="Enable or disable API">
+                    <InputLabel>Доступ к API</InputLabel>
+                    <Tooltip title="Открыть/закрыть доступ к API">
                       <IconButton>
                         <HelpOutlineIcon fontSize="small" />
                       </IconButton>
@@ -134,8 +134,8 @@ function Settings() {
                 <Grid container direction="column" spacing={0}>
                   <Grid item>
                     <Box display="flex" alignItems="center">
-                      <InputLabel>Time to Store</InputLabel>
-                      <Tooltip title="Select the time to store data">
+                      <InputLabel>Хранить распознавания</InputLabel>
+                      <Tooltip title="Сколько распознавания хранятся в базе">
                         <IconButton>
                           <HelpOutlineIcon fontSize="small" />
                         </IconButton>
@@ -145,10 +145,10 @@ function Settings() {
                   <Grid item>
                     <FormControl fullWidth>
                       <Select value={settings.time_to_store} onChange={(e) => setTimeToStore(e.target.value)}>
-                        <MenuItem value={1}>1 Day</MenuItem>
-                        <MenuItem value={7}>1 Week</MenuItem>
-                        <MenuItem value={14}>2 Weeks</MenuItem>
-                        <MenuItem value={30}>1 Month</MenuItem>
+                        <MenuItem value={1}>1 День</MenuItem>
+                        <MenuItem value={7}>1 Неделя</MenuItem>
+                        <MenuItem value={14}>2 Недели</MenuItem>
+                        <MenuItem value={30}>1 Месяц</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -157,8 +157,8 @@ function Settings() {
                 <Grid container direction="column" spacing={0}>
                   <Grid item>
                     <Box display="flex" alignItems="center">
-                      <InputLabel>Sub URL</InputLabel>
-                      <Tooltip title="Enter the sub URL of your personal portal">
+                      <InputLabel>Название портала</InputLabel>
+                      <Tooltip title="Название отображаемое в шапке сайта">
                         <IconButton>
                           <HelpOutlineIcon fontSize="small" />
                         </IconButton>
@@ -166,7 +166,7 @@ function Settings() {
                     </Box>
                   </Grid>
                   <Grid item>
-                    <TextField fullWidth inputRef={subUrlInputRef} onChange={setSubUrl}/>
+                    <TextField fullWidth inputRef={nameInputRef} onChange={setSubUrl}/>
                   </Grid>
                 </Grid>
 
@@ -174,7 +174,7 @@ function Settings() {
                   <Grid item>
                     <Box display="flex" alignItems="center">
                       <InputLabel>Email</InputLabel>
-                      <Tooltip title="Enter the email to send notifications">
+                      <Tooltip title="Почта для уведомлений">
                         <IconButton>
                           <HelpOutlineIcon fontSize="small" />
                         </IconButton>
@@ -187,10 +187,10 @@ function Settings() {
                 </Grid>
                 <Box mt={2} display="flex" justifyContent="space-between">
                   <Button color="info" onClick={handleCancel}>
-                    Cancel
+                    Отмена
                   </Button>
                   <Button variant="contained" color="primary" onClick={handleSave}>
-                    Save
+                    Сохранить
                   </Button>
                 </Box>
               </Box>

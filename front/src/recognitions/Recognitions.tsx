@@ -20,8 +20,11 @@ interface Page {
   previous: string | null;
 }
 
-export function formatDate(dateString: string) {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+export function formatDate(dateString: string, time: boolean = true) {
+  let options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric'};
+  if (time === true)
+    options = { ...options, hour: 'numeric', minute: 'numeric'};
+
   const date = new Date(dateString);
   return date.toLocaleDateString("RU", options);
 }

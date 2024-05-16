@@ -14,7 +14,7 @@ class Emotion(models.Model):
 
 
 def _user_directory_path(instance, filename):
-    return f'{instance.portal.sub_url}/known/{instance.username}/{filename}'
+    return f'{instance.portal.name}/known/{instance.username}/{filename}'
 
 
 class Face(models.Model):
