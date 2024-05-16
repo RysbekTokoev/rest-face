@@ -12,16 +12,15 @@ import MenuItem from '@mui/material/MenuItem';
 import Trends from "./Trends";
 
 function Dashboard() {
-  const [date, setDate] = React.useState(new Date());
+  const [date, setDate] = React.useState(new Date(Date.now() + 6 * 60 * 60 * 1000));
   const [dateRange, setDateRange] = React.useState('today');
 
   const handleDateRangeChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
     setDateRange(value);
-
     switch (value) {
       case 'today':
-        setDate(new Date());
+        setDate(new Date(Date.now() + 6 * 60 * 60 * 1000));
         break;
       case 'yesterday':
         setDate(new Date(Date.now() - 1 * 24 * 60 * 60 * 1000));
@@ -52,7 +51,6 @@ function Dashboard() {
           sx={{mb: 1}}
         >
           <MenuItem value={'today'}>За сегодня</MenuItem>
-          <MenuItem value={'yesterday'}>За вчера</MenuItem>
           <MenuItem value={'week'}>За неделю</MenuItem>
           <MenuItem value={'month'}>За месяц</MenuItem>
           <MenuItem value={'year'}>За год</MenuItem>

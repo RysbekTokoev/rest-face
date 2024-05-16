@@ -49,17 +49,25 @@ interface INotification {
   watched: boolean;
 }
 
+interface ISettings {
+    name: string;
+}
+
 export default function AppBar({ toggleDrawer }: { toggleDrawer: () => void }) {
   const open = useGetOpen();
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [settings, setSettings] = useState<ISettings>({ name: 'REST-Face' });
 
   useEffect(() => {
     axios.get('http://127.0.0.1:8000/api/main/notifications/')
       .then(response => {
         setNotifications(response.data.results);
       });
+    axios.get('http://127.0.0.1:8000/api/portal/settings/my_settings/').then(response => {
+        setSettings(response.data);
+    });
   }, []);
 
   const handleNotificationsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -84,6 +92,18 @@ export default function AppBar({ toggleDrawer }: { toggleDrawer: () => void }) {
         pr: '24px', // keep right padding when drawer closed
       }}
     >
+      <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={toggleDrawer}
+              sx={{
+                marginRight: '36px',
+                ...(open && { display: 'none' }),
+              }}
+            >
+              <MenuIcon />
+      </IconButton>
       <Typography
         component="h1"
         variant="h6"
@@ -92,7 +112,7 @@ export default function AppBar({ toggleDrawer }: { toggleDrawer: () => void }) {
         sx={{ flexGrow: 1 }}
       >
         <Link href="/" color="inherit" underline="none">
-          REST-Face
+          {settings.name? settings.name : 'REST-Face'}
         </Link>
       </Typography>
       <IconButton color="inherit" onClick={handleNotificationsClick}>

@@ -1,11 +1,7 @@
-from urllib.parse import unquote
-
 import numpy as np
-from django.conf import settings
 from rest_framework import serializers
 
 from main.models import Face
-from main.utils.image_utils import get_encoding
 
 
 class FaceSerializer(serializers.ModelSerializer):

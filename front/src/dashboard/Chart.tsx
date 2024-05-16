@@ -16,7 +16,6 @@ export default function Chart({date}: {date: Date}) {
   React.useEffect(() => {
     axios.get("http://127.0.0.1:8000/api/main/recognitions/chart/?start_date=" + date.toISOString().slice(0, 10)).then(response => {
         setData(response.data);
-        console.log(response.data);
         setMax(response.data.reduce((acc: number, item: any) => Math.max(acc, item.count), 10));
     });
   }, [date]);

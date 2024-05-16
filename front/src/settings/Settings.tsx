@@ -55,7 +55,7 @@ function Settings() {
 
   const handleSave = () => {
     axios.patch(`http://127.0.0.1:8000/api/portal/settings/${settings.id}/`, settings).then(response => {
-      console.log(response);
+      window.location.reload();
     });
   };
 
@@ -101,20 +101,20 @@ function Settings() {
                   />
                 </Box>
 
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Box display="flex" alignItems="center">
-                    <InputLabel>Неизвестные лица</InputLabel>
-                    <Tooltip title="Распознавать неизвестные лица">
-                      <IconButton>
-                        <HelpOutlineIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                  <FormControlLabel
-                    control={<Switch checked={settings.detect_unknown} onChange={() => setDetectUnknown(!settings.detect_unknown)} />}
-                    label=""
-                  />
-                </Box>
+                {/*<Box display="flex" justifyContent="space-between" alignItems="center">*/}
+                {/*  <Box display="flex" alignItems="center">*/}
+                {/*    <InputLabel>Неизвестные лица</InputLabel>*/}
+                {/*    <Tooltip title="Распознавать неизвестные лица">*/}
+                {/*      <IconButton>*/}
+                {/*        <HelpOutlineIcon fontSize="small" />*/}
+                {/*      </IconButton>*/}
+                {/*    </Tooltip>*/}
+                {/*  </Box>  */}
+                  {/*<FormControlLabel*/}
+                  {/*  control={<Switch checked={settings.detect_unknown} onChange={() => setDetectUnknown(!settings.detect_unknown)} />}*/}
+                  {/*  label=""*/}
+                  {/*/>*/}
+                {/*</Box>*/}
 
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Box display="flex" alignItems="center">

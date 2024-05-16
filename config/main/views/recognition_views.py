@@ -77,6 +77,20 @@ class RecognitionViewSet(viewsets.ModelViewSet):
 
         return Response(recognitions)
 
+    @property
+    def paginator(self):
+        self._paginator = super(RecognitionViewSet, self).paginator
+        if self.action == 'all':
+            self._paginator = None
+        return self._paginator
+
+    @action(detail=False, methods=['get'])
+    def all(self, request):
+        queryset = self.get_queryset()
+        queryset = self.filter_queryset(queryset)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     @action(detail=False, methods=['get'])
     def circle_emotion(self, request):
         queryset = self.get_queryset()
